@@ -1,0 +1,215 @@
+@extends('backend.layouts.main')
+@section('main-section')
+
+  <section class="dashboard row g-4">
+
+<meta name="csrf-token" content="{{ csrf_token() }}">
+<div class="container py-5">
+  <h2 class="text-warning mb-4">Permission Management</h2>
+
+  <!-- Add Permission Form -->
+  <form id="addPermissionForm" class="d-flex gap-2 mb-4" action="{{ route('add_permission') }}" method="POST">
+    @csrf
+    <input type="text" name="permissionName" class="form-control" placeholder="Enter Permission Name" required>
+    <button type="button" class="btn btn-success" onclick="addPermission()">Add</button>
+  </form>
+<!-- pagination code starts here -->
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <input type="text" id="searchPermission" class="form-control w-25" placeholder="Search Permission...">
+  <div id="paginationControls" class="d-flex gap-2"></div>
+</div>
+<!-- end of pagination code -->
+  <!-- Permission Table -->
+  <table id="permissionsTable" class="table table-dark table-striped table-hover align-middle">
+    <thead class="text-warning">
+      <tr>
+        <th>#</th>
+        <th>Permission Name</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="permissionsBody">
+      <!-- Dynamic rows will be loaded here -->
+    </tbody>
+  </table>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editPermissionModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content bg-dark text-light">
+      <div class="modal-header">
+        <h5 class="modal-title text-warning">Edit Permission</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="editPermissionId">
+        <div class="mb-3">
+          <label for="editPermissionName" class="form-label">Permission Name</label>
+          <input type="text" id="editPermissionName" class="form-control" required>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-warning" onclick="updatePermission()">Update</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="{{ asset('assets/backend/js/bootstrap.bundle.min.js') }}"></script>
+<!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script> -->
+<script>
+document.addEventListener('DOMContentLoaded', fetchPermissions);
+
+function fetchPermissions() {
+  fetch('{{ route("permissions.get") }}')
+    .then(res => res.json())
+    .then(data => {
+      const tbody = document.getElementById('permissionsBody');
+      tbody.innerHTML = '';
+      if (data.success && data.data.length > 0) {
+        data.data.forEach((perm, i) => {
+          tbody.insertAdjacentHTML('beforeend', `
+            <tr>
+              <td>${i + 1}</td>
+              <td>${perm.name}</td>
+              <td>
+                <button class="btn btn-sm btn-info" onclick="openEditModal(${perm.id}, '${perm.name}')">Edit</button>
+                <button class="btn btn-sm btn-danger" onclick="deletePermission(${perm.id})">Delete</button>
+              </td>
+            </tr>
+          `);
+        });
+      } else {
+        tbody.innerHTML = `<tr><td colspan="3" class="text-center text-secondary">No permissions found</td></tr>`;
+      }
+    });
+}
+
+function addPermission() {
+  const form = document.getElementById('addPermissionForm');
+  const formData = new FormData(form);
+
+  fetch(form.action, {
+    method: 'POST',
+    body: formData,
+    headers: {'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content}
+  })
+  .then(res => res.json())
+  .then(data => {
+    Swal.fire({
+      icon: data.success ? 'success' : 'error',
+      title: data.message,
+      timer: 1500,
+      showConfirmButton: false
+    });
+    if (data.success) {
+      form.reset();
+      fetchPermissions();
+    }
+  });
+}
+
+function openEditModal(id, name) {
+  document.getElementById('editPermissionId').value = id;
+  document.getElementById('editPermissionName').value = name;
+  new bootstrap.Modal(document.getElementById('editPermissionModal')).show();
+}
+
+function updatePermission() {
+  const id = document.getElementById('editPermissionId').value;
+  const permissionName = document.getElementById('editPermissionName').value;
+// alert(permissionName);
+  fetch('{{ route("permissions_update") }}', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+    },
+    body: JSON.stringify({ id, permissionName })
+  })
+  .then(res => res.json())
+  .then(data => {
+    Swal.fire({
+      icon: data.success ? 'success' : 'error',
+      title: data.message,
+      timer: 1500,
+      showConfirmButton: false
+    });
+    if (data.success) {
+      bootstrap.Modal.getInstance(document.getElementById('editPermissionModal')).hide();
+      fetchPermissions();
+    }
+  });
+}
+
+function deletePermission(id) {
+  Swal.fire({
+    title: 'Are you sure?',
+    text: 'This action cannot be undone!',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#6c757d',
+    confirmButtonText: 'Yes, delete it!'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+      fetch(`/delete_permission/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'X-CSRF-TOKEN': token,
+          'Accept': 'application/json'
+        }
+      })
+      .then(res => res.json())
+      .then(data => {
+        Swal.fire({
+          icon: data.success ? 'success' : 'error',
+          title: data.message,
+          timer: 1500,
+          showConfirmButton: false
+        });
+        if (data.success) fetchPermissions();
+      })
+      .catch(err => {
+        console.error('Error deleting:', err);
+        Swal.fire('Error', 'Failed to delete permission', 'error');
+      });
+    }
+  });
+}
+
+</script>
+
+  <style>
+    body {
+      background-color: #121212;
+    }
+
+    .card {
+      border-radius: 15px;
+      background-color: #1e1e1e;
+      border: 1px solid #333;
+    }
+
+    .btn-warning {
+      background-color: #ffc107;
+      border: none;
+    }
+
+    .btn-warning:hover {
+      background-color: #ffca2c;
+    }
+
+    .table-hover tbody tr:hover {
+      background-color: #2b2b2b;
+    }
+
+    .form-control:focus {
+      box-shadow: none;
+    }
+  </style>
+@endsection
