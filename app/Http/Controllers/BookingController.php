@@ -5,9 +5,33 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-class BookingController extends Controller
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+class BookingController extends Controller implements HasMiddleware
 {
     //
+
+        public static function middleware(): array
+    {
+        return static::middlewares();
+    }
+    public static function middlewares(): array
+    {
+        return [
+            new Middleware(middleware: 'auth'),
+
+            new Middleware(middleware: 'permission:view booking', only: ['index']),
+
+            new Middleware(middleware: 'permission:create booking', only: ['create', 'store']),
+
+            new Middleware(middleware: 'permission:edit booking', only: ['edit', 'update']),
+
+            new Middleware(middleware: 'permission:delete booking', only: ['delete']),
+        ];    
+    }
+
+
+
     public function bookings()
     {
         // Logic to retrieve and display bookings

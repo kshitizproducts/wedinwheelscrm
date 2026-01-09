@@ -3,9 +3,29 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-
-class BasicInformationController extends Controller
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+class BasicInformationController extends Controller implements HasMiddleware
 {
+     public static function middleware(): array
+    {
+        return static::middlewares();
+    }
+    public static function middlewares(): array
+    {
+        return [
+            new Middleware(middleware: 'auth'),
+
+            new Middleware(middleware: 'permission:view companyprofile', only: ['index']),
+
+            new Middleware(middleware: 'permission:create companyprofile', only: ['create', 'store']),
+
+            new Middleware(middleware: 'permission:edit companyprofile', only: ['edit', 'update']),
+
+            new Middleware(middleware: 'permission:delete companyprofile', only: ['delete']),
+        ];    
+    }
+
     public function index()
     {
         return view('backend.pages/basic_information.index');
@@ -62,7 +82,7 @@ class BasicInformationController extends Controller
             @unlink(public_path($existing->profile_picture));
         }
     }
-
+ 
     // UPDATE
     if ($id) {
         DB::table('business_profiles')->where('id', $id)->update($data);

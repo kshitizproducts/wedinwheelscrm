@@ -8,6 +8,7 @@ use App\Http\Controllers\AddressContactsController;
 use App\Http\Controllers\BasicInformationController;
 use App\Http\Controllers\FinancialBankingController;
 use App\Http\Controllers\LegalComplianceController;
+use App\Http\Controllers\DriverTaskController;
 use Illuminate\Support\Facades\Mail;
 
 
@@ -178,23 +179,39 @@ Route::delete('/address_contacts/delete/{id}', [AddressContactsController::class
 // financial
 
 Route::get('/financial_banking', [FinancialBankingController::class, 'index'])->name('financial_banking_index');
-
 Route::get('/financial_banking/get', [FinancialBankingController::class, 'get'])->name('financial_banking_get');
-
 Route::post('/financial_banking/save', [FinancialBankingController::class, 'save'])->name('financial_banking_save');
-
 Route::get('/financial_banking/edit/{id}', [FinancialBankingController::class, 'edit'])->name('financial_banking_edit');
-
 Route::delete('/financial_banking/delete/{id}', [FinancialBankingController::class, 'delete'])->name('financial_banking_delete');
 
 
+ 
+
+ 
+
+// driver tasks routes
+
+Route::get('/driver/tasks', [DriverTaskController::class, 'index'])->name('driver.tasks');
+Route::get('/driver/task/list', [DriverTaskController::class, 'list'])->name('driver.task.list');
+Route::post('/driver/task/store', [DriverTaskController::class, 'store'])->name('driver.task.store');
+Route::get('/driver/task/edit/{id}', [DriverTaskController::class, 'edit']);
+Route::post('/driver/task/update', [DriverTaskController::class, 'update'])->name('driver.task.update');
+Route::delete('/driver/task/delete/{id}', [DriverTaskController::class, 'delete']);
+Route::post('update_driver_schedule/{id}', [DriverTaskController::class, 'update_driver_schedule']);
+Route::get('delete_driver_schedule/{id}', [DriverTaskController::class, 'delete_driver_schedule']);
 
 
 
 
-
-
-
+Route::get('/driver_tasks', [DriverTaskController::class, 'driver_tasks'])->name('driver_tasks');
+Route::post('driver_task_start/{id}', [DriverTaskController::class, 'driver_task_start']);
+Route::post('driver_task_end/{id}', [DriverTaskController::class, 'driver_task_end']);
+Route::post('driver_task_remark/{id}', [DriverTaskController::class, 'driver_task_remark']);
+Route::get('delete_driver_task/{id}', [DriverTaskController::class, 'delete_driver_task']);
+Route::get(
+    'driver-task-remarks/{id}',
+    [DriverTaskController::class,'driver_task_remarks']
+);
 
 
 });

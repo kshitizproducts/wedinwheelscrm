@@ -7,11 +7,32 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
-class CarsMasterController extends Controller
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+class CarsMasterController extends Controller implements HasMiddleware
 {
-    //
+    //  
+    public static function middleware(): array
+    {
+        return static::middlewares();
+    }
+    public static function middlewares(): array
+    {
+        return [
+            new Middleware(middleware: 'auth'),
+
+            new Middleware(middleware: 'permission:view cars', only: ['index']),
+
+            new Middleware(middleware: 'permission:create cars', only: ['create', 'store']),
+
+            new Middleware(middleware: 'permission:edit cars', only: ['edit', 'update']),
+
+            new Middleware(middleware: 'permission:delete cars', only: ['delete']),
+        ];    
+    }
 
 
+ 
 
     // In your Laravel Controller
 public function car_status()
@@ -177,7 +198,7 @@ public function car_status()
         $car_service_data = DB::table('car_service')->where('car_id', $id)->get();
         return view('backend/pages/cars/edit_profile', compact('id', 'car_data', 'document_master', 'doc_data', 'service_master', 'garage_master', 'car_service_data'));
     }
-
+   
   
     public function updateProfilePart1(Request $request)
     {
@@ -305,57 +326,65 @@ public function car_status()
             ], 500);
         }
     }
-
-
-  public function save_imp_docs(Request $request)
+   
+public function save_imp_docs(Request $request) 
 {
     $car_id = $request->car_id;
-
     $uploadPath = public_path('uploads/cars/important_documents');
 
-    // Create folder if it doesn't exist
     if (!file_exists($uploadPath)) {
         mkdir($uploadPath, 0777, true);
     }
 
-    $dataToUpdate = [];
+    $dataToUpdate = []; 
+    
+    // Array to handle repetitive logic for RC, Pollution, Insurance
+    $docs = [
+        'rc_book' => 'rc_expiry',
+        'pollution' => 'pollution_expiry',
+        'insurance' => 'insurance_expiry'
+    ];
 
-    // RC Book
-    if ($request->hasFile('rc_book')) {
-        $rc = $request->file('rc_book');
-        $rc_filename = time() . '_rc_' . uniqid() . '.' . $rc->getClientOriginalExtension();
-        $rc->move($uploadPath, $rc_filename);
-        $dataToUpdate['rc_book'] = 'uploads/cars/important_documents/' . $rc_filename;
+    foreach ($docs as $fileKey => $dateKey) {
+        // 1. Handle File Upload (Update 'cars' table)
+        if ($request->hasFile($fileKey)) {
+            $file = $request->file($fileKey);
+            $filename = time() . '_' . $fileKey . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $file->move($uploadPath, $filename);
+            $filePath = 'uploads/cars/important_documents/' . $filename;
+            
+            $dataToUpdate[$fileKey] = $filePath;
+        }
+
+        // 2. Handle Expiry Date (Update or Insert into 'car_documents' table)
+        if ($request->filled($dateKey)) {
+            DB::table('car_documents')->updateOrInsert(
+                [
+                    'car_id' => $car_id, 
+                    'document_id' => $fileKey // Yahan hum name save kar rahe hain identify karne ke liye
+                ],
+                [
+                    'expiry_date' => $request->$dateKey,
+                    'status' => 1,
+                    'updated_at' => now(),
+                    'created_at' => now()
+                ]
+            );
+        }
     }
 
-    // Pollution
-    if ($request->hasFile('pollution')) {
-        $pollution = $request->file('pollution');
-        $pollution_filename = time() . '_pollution_' . uniqid() . '.' . $pollution->getClientOriginalExtension();
-        $pollution->move($uploadPath, $pollution_filename);
-        $dataToUpdate['pollution'] = 'uploads/cars/important_documents/' . $pollution_filename;
-    }
-
-    // Insurance
-    if ($request->hasFile('insurance')) {
-        $insurance = $request->file('insurance');
-        $insurance_filename = time() . '_insurance_' . uniqid() . '.' . $insurance->getClientOriginalExtension();
-        $insurance->move($uploadPath, $insurance_filename);
-        $dataToUpdate['insurance'] = 'uploads/cars/important_documents/' . $insurance_filename;
-    }
-
-    // Update only if any file was uploaded
+    // Update cars table for paths
     if (!empty($dataToUpdate)) {
         DB::table('cars')
             ->where('unique_id', $car_id)
             ->update($dataToUpdate);
     }
 
-    return response()->json(['success' => true, 'message' => 'Important documents uploaded successfully!!!']);
+    return response()->json(['success' => true, 'message' => 'Documents and Expiry Dates updated successfully!!!']);
 }
 
 
-
+   
 
     public function add_document(Request $request)
     {

@@ -1,4 +1,5 @@
 <?php
+use App\Http\Controllers\DriverTaskController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\MyTaskController;
@@ -17,8 +18,9 @@ Route::middleware(['custom_auth', 'role:Admin'])->group(function () {
 Route::get('/my_task', [MyTaskController::class, 'my_task'])->name('my_task');
 Route::get('/driver_schedule', [MyTaskController::class, 'driver_schedule'])->name('driver_schedule');
 
- 
 
+  Route::post('assign_task_to_drivers', [DriverTaskController::class, 'assign_task_to_drivers'])
+    ->name('assign_task_to_drivers');
 
 
 // Route::post('/add_new_cars', [CarsMasterController::class, 'add_new_cars'])->name('add_new_cars');

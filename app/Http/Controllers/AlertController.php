@@ -6,9 +6,34 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Events\NewAlertAdded;
 use Illuminate\Support\Facades\DB;
-class AlertController extends Controller
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+class AlertController extends Controller implements HasMiddleware
 {
     //
+
+     public static function middleware(): array
+    {
+        return static::middlewares();
+    }
+    public static function middlewares(): array
+    {
+        return [
+            new Middleware(middleware: 'auth'),
+
+            new Middleware(middleware: 'permission:view alert', only: ['index']),
+
+            new Middleware(middleware: 'permission:create alert', only: ['create', 'store']),
+
+            new Middleware(middleware: 'permission:edit alert', only: ['edit', 'update']),
+
+            new Middleware(middleware: 'permission:delete alert', only: ['delete']),
+        ];    
+    }
+
+
+
+
      public function index()
     {
         return view('alert');

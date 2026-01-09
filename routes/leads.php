@@ -11,8 +11,10 @@ Route::get('/my_leads', [LeadController::class, 'my_leads'])->name('my_leads');
 Route::get('/lead_generation', [LeadController::class, 'lead_generation'])->name('lead_generation');
 Route::post('/save_client_data', [LeadController::class, 'save_client_data'])->name('save_client_data');
 Route::post('/assign_lead_to_manager', [LeadController::class, 'assign_lead_to_manager'])->name('assign_lead_to_manager');
+  Route::post('/save_client_car_filter', [LeadController::class, 'save_client_car_filter'])->name('save_client_car_filter');
   
   
+   
   
   
   

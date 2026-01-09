@@ -8,6 +8,43 @@ use Illuminate\Support\Facades\DB;
 class LeadController extends Controller
 {
     // 
+    public function save_client_car_filter(Request $request) 
+{
+
+    dd($request->all());
+    // Validation
+    $request->validate([
+        'client_name' => 'required',
+        'contact' => 'required',
+        'selected_cars' => 'required|array' // Check karega ki kam se kam 1 car select ho
+    ]);
+
+    // Data prepare karein
+    $data = [
+        'client_name'   => $request->client_name,
+        'contact'       => $request->contact,
+        // Array ko string (JSON) mein badal kar save karenge
+        'selected_cars' => json_encode($request->selected_cars), 
+        'updated_at'    => now(),
+        'created_at'    => now(),
+    ];
+
+    // Database mein insert karein (Table name check kar lena apni leads wali)
+    DB::table('leads')->insert($data);
+
+    return response()->json(['success' => true, 'message' => 'Client data and selected cars saved!']);
+}
+
+
+
+
+
+
+
+
+
+
+
 
     public function lead_generation()
     {

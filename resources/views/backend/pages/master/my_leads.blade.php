@@ -61,143 +61,174 @@
                                         </button>
 
 
-<div class="modal fade" id="sharetoclient{{ $lead->id }}" tabindex="-1"
-    aria-labelledby="sharetoclient{{ $lead->id }}Label" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-centered">
-        <div class="modal-content bg-dark text-white border border-warning">
-            <div class="modal-header border-warning">
-                <h5 class="modal-title text-warning" id="addLeadModalLabel">
-                    Share Car Details to {{ $lead->client_name }} !
-                </h5>
-                <button type="button" class="btn-close btn-close-white"
-                    data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
+                                        <div class="modal fade" id="sharetoclient{{ $lead->id }}" tabindex="-1"
+                                            aria-labelledby="sharetoclient{{ $lead->id }}Label" aria-hidden="true">
+                                            <div class="modal-dialog modal-xl modal-dialog-centered">
+                                                <div class="modal-content bg-dark text-white border border-warning">
+                                                    <div class="modal-header border-warning">
+                                                        <h5 class="modal-title text-warning" id="addLeadModalLabel">
+                                                            Share Car Details to {{ $lead->client_name }} !
+                                                        </h5>
+                                                        <button type="button" class="btn-close btn-close-white"
+                                                            data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+<form id="add_new_lead_form" method="post" action="{{ url('save_client_car_filter') }}" class="p-3">
+    @csrf
 
-            <form id="add_new_lead_form" method="post"
-                action="{{ url('save_client_data') }}" class="p-3">
-                @csrf
-                <div class="modal-body">
 
-                    <!-- Client Name -->
-                    <div class="mb-4">
-                        <label class="form-label text-warning">Client Name</label>
-                        <input type="text"
-                            class="form-control bg-secondary text-white border-0"
-                            placeholder="Enter Client Name"
-                            value="{{ $lead->client_name }}" name="client_name" required>
-                    </div>
+    <input type="hidden" value="{{ $lead->id }}" name="lead_id">
+    <div class="modal-body">
+        <div class="row">
+          
+        </div>
 
-                    <div class="mb-4">
-                        <label class="form-label text-warning">Contact</label>
-                        <input type="number"
-                            class="form-control bg-secondary text-white border-0"
-                            placeholder="Enter Contact"
-                            value="{{ $lead->contact }}" name="contact" required>
-                    </div>
+        <div class="mb-3">
+            <label class="form-label text-warning">Booking Date: </label>
+            <span class="badge bg-warning text-danger px-3 py-2">
+                {{ $lead->booking_date ?? 'NA' }}
+            </span>
+        </div>
 
-                    <div class="mb-4">
-                        <label class="form-label text-warning">Booking Date</label>
-                        <span class="badge bg-warning text-danger">
-                            {{ $lead->booking_date ?? 'NA' }}
-                        </span>
-                    </div>
+        <hr class="border-secondary">
 
-                    <div class="form-group">
-                        <label for="car">Select Available Cars</label>
-                        <div class="row">
-     @foreach ($cars as $car)
-    @php
-        // next_availability check
-        $available = empty($car->next_availability) || 
-                     $car->next_availability <= $lead->booking_date;
-                     
-        $profilepublicUrl = $car->profile_pic;
-    @endphp
-    
-    <div class="col-md-4">
-        <div class="card mb-3 shadow-sm"
-            style="border: 1px solid {{ $available ? '#ddd' : '#ffc107' }}; border-radius: 8px; background-color: {{ $available ? '#fff' : '#343a40' }}; transition: 0.3s;">
-            <div class="card-body text-center">
-                <img src="{{ asset($profilepublicUrl) }}"
-                    alt="{{ $car->brand }}"
-                    class="img-fluid mb-2 shadow-sm rounded"
-                    style="height:150px; width: 100%; object-fit:cover; filter: {{ $available ? 'none' : 'grayscale(40%)' }};">
-                
-                <h6 class="mb-1 fw-bold {{ $available ? 'text-dark' : 'text-warning' }}">{{ $car->brand }} - {{ $car->model }}</h6>
-                
-                <small class="{{ $available ? 'text-muted' : 'text-white-50' }} d-block">Reg No: {{ $car->registration_no }}</small>
-                <small class="d-block {{ $available ? 'text-info' : 'text-info' }}">Mileage: {{ $car->mileage }} | {{ $car->fuel_type }}</small>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="text-white mb-0">Select Available Cars ({{ count($cars) }})</h5>
+            <input type="text" id="carSearch" class="form-control form-control-sm w-50" placeholder="Search car by name or reg no...">
+        </div>
 
-                <div class="mt-3">
-                    <input type="checkbox" name="selected_cars[]"
-                        value="{{ $car->id }}"
-                        id="car_{{ $car->id }}"
-                        style="width: 20px; height: 20px; vertical-align: middle; cursor: pointer;">
-                    
-                    <label for="car_{{ $car->id }}" class="ms-1 fw-bold {{ $available ? 'text-success' : 'text-danger' }}" style="cursor: pointer;">
-                        @if($available)
-                            <i class="fas fa-check-circle"></i> Available
-                        @else
-                            <i class="fas fa-exclamation-triangle"></i> Engaged in Booking
-                        @endif
-                    </label>
+        <div class="car-selection-container" style="max-height: 500px; overflow-y: auto; overflow-x: hidden; padding-right: 5px;">
+            <div class="row" id="carList">
+                @foreach ($cars as $car)
+                    @php
+                        $available = empty($car->next_availability) || $car->next_availability <= $lead->booking_date;
+                        $profilepublicUrl = $car->profile_pic;
+                    @endphp
 
-                    @if(!$available)
-                        <div class="mt-1">
-                            <small class="text-warning" style="font-size: 0.75rem;">
-                                Note: Busy until <strong>{{ date('d M Y', strtotime($car->next_availability)) }}</strong>
-                            </small>
+                    <div class="col-md-4 car-item" data-name="{{ strtolower($car->brand . ' ' . $car->model . ' ' . $car->registration_no) }}">
+                        <div class="card mb-3 shadow-sm car-card" 
+                            onclick="toggleCheckbox('car_{{ $car->id }}')"
+                            style="border: 1px solid {{ $available ? '#444' : '#ffc107' }}; border-radius: 12px; background-color: {{ $available ? '#2d2d2d' : '#1a1a1a' }}; cursor: pointer; transition: 0.3s;">
+                            
+                            <div class="card-body p-2 text-center">
+                                <div style="position: relative;">
+                                    <img src="{{ asset($profilepublicUrl) }}" alt="{{ $car->brand }}"
+                                        class="img-fluid mb-2 rounded"
+                                        style="height:110px; width: 100%; object-fit:cover; filter: {{ $available ? 'none' : 'grayscale(100%)' }};">
+                                    
+                                    <input type="checkbox" class="car-checkbox" 
+                                        name="selected_cars[]" 
+                                        value="{{ $car->brand }} {{ $car->model }} ({{ $car->registration_no }})" 
+                                        id="car_{{ $car->id }}"
+                                        style="position: absolute; top: 10px; right: 10px; width: 20px; height: 20px; accent-color: #ffc107;">
+                                </div>
+
+                                <h6 class="mb-1 fw-bold {{ $available ? 'text-white' : 'text-warning' }}" style="font-size: 0.9rem;">
+                                    {{ $car->brand }} {{ $car->model }}
+                                </h6>
+                                <small class="text-muted d-block" style="font-size: 0.75rem;">{{ $car->registration_no }}</small>
+                                
+                                @if ($available)
+                                    <span class="badge bg-success-subtle text-success mt-1" style="font-size: 0.7rem;">Available</span>
+                                @else
+                                    <span class="badge bg-danger-subtle text-danger mt-1" style="font-size: 0.7rem;">Engaged</span>
+                                    <div class="mt-1">
+                                        <small class="text-warning" style="font-size: 0.65rem;">
+                                            Until: <strong>{{ date('d M', strtotime($car->next_availability)) }}</strong>
+                                        </small>
+                                    </div>
+                                @endif
+                            </div>
                         </div>
-                    @endif
-                </div>
+                    </div>
+                @endforeach
             </div>
         </div>
     </div>
-@endforeach           </div>
-                    </div>
-                </div>
 
-                <!-- ✅ Moved Inside Modal -->
-                <div class="modal-footer justify-content-center border-top border-warning">
-                    <a href="mailto:?subject=Car%20Details&body=Here%20are%20the%20car%20details%20you%20requested."
-                        target="_blank"
-                        class="btn btn-warning text-dark shadow-sm d-flex align-items-center"
-                        title="Share via Email"
-                        style="padding:8px 12px; border-radius:30px;">
-                        <img src="https://cdn-icons-png.flaticon.com/512/732/732200.png"
-                            alt="Email" width="20"
-                            style="margin-right:8px; display:inline-block;">
-                        Email
-                    </a>
+    <div class="modal-footer justify-content-center border-top border-warning bg-dark">
+        <button type="button" onclick="shareViaEmail()" class="btn btn-warning text-dark shadow-sm d-flex align-items-center px-4" style="border-radius:30px;">
+            <img src="https://cdn-icons-png.flaticon.com/512/732/732200.png" width="20" class="me-2"> Email
+        </button>
 
-                    <a href="https://api.whatsapp.com/send?text=Check%20out%20these%20car%20details:%20https://example.com"
-                        target="_blank"
-                        class="btn btn-success shadow-sm d-flex align-items-center"
-                        title="Share on WhatsApp"
-                        style="padding:8px 12px; border-radius:30px;">
-                        <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png"
-                            alt="WhatsApp" width="20"
-                            style="margin-right:8px; display:inline-block;">
-                        WhatsApp
-                    </a>
-                </div>
-            </form>
-        </div>
+        <button type="button" onclick="shareViaWhatsApp()" class="btn btn-success shadow-sm d-flex align-items-center px-4" style="border-radius:30px;">
+            <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" width="20" class="me-2"> WhatsApp
+        </button>
+        
+        <button type="submit" class="btn btn-outline-light px-4" style="border-radius:30px;">Save Data</button>
     </div>
-</div>
+</form>
 
 <style>
-    @media (max-width: 480px) {
-        .modal-footer a {
-            padding: 6px 10px;
-            font-size: 14px;
-        }
-    }
+    /* Scrollbar styling for a better dark look */
+    .car-selection-container::-webkit-scrollbar { width: 6px; }
+    .car-selection-container::-webkit-scrollbar-track { background: #1a1a1a; }
+    .car-selection-container::-webkit-scrollbar-thumb { background: #ffc107; border-radius: 10px; }
+    .car-card:hover { transform: translateY(-3px); border-color: #ffc107 !important; }
 </style>
+
+<script>
+    // 1. Search Logic
+    document.getElementById('carSearch').addEventListener('keyup', function() {
+        let filter = this.value.toLowerCase();
+        let items = document.querySelectorAll('.car-item');
+        items.forEach(item => {
+            if (item.getAttribute('data-name').includes(filter)) {
+                item.style.display = "";
+            } else {
+                item.style.display = "none";
+            }
+        });
+    });
+
+    // 2. Click on Card to Checkbox
+    function toggleCheckbox(id) {
+        const cb = document.getElementById(id);
+        cb.checked = !cb.checked;
+    }
+
+    // 3. Get Selected Cars Text
+    function getSelectedCars() {
+        let selected = [];
+        document.querySelectorAll('.car-checkbox:checked').forEach(cb => {
+            selected.push(cb.value);
+        });
+        return selected;
+    }
+
+    // 4. WhatsApp Share
+    function shareViaWhatsApp() {
+        let cars = getSelectedCars();
+        if (cars.length === 0) { alert('Please select at least one car'); return; }
+        
+        let text = "Hello, here are the available car details:\n\n" + cars.join("\n") + "\n\nRegards.";
+        window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(text), "_blank");
+    }
+
+    // 5. Email Share
+    function shareViaEmail() {
+        let cars = getSelectedCars();
+        if (cars.length === 0) { alert('Please select at least one car'); return; }
+        
+        let body = "Hello,\n\nRequested car details:\n" + cars.join("\n");
+        window.location.href = "mailto:?subject=Available Car Details&body=" + encodeURIComponent(body);
+    }
+</script>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <style>
+                                            @media (max-width: 480px) {
+                                                .modal-footer a {
+                                                    padding: 6px 10px;
+                                                    font-size: 14px;
+                                                }
+                                            }
+                                        </style>
 
                                         {{-- end of share code --}}
                                         <!-- Email -->
-    
+
                                     </td>
 
                                     <td>
