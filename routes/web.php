@@ -12,14 +12,24 @@ use App\Http\Controllers\EmployeeDocumentationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CarServicingController;
 use App\Http\Controllers\DriverTaskController;
+use App\Http\Controllers\LeadController;
+
 use Illuminate\Support\Facades\Mail;
 use App\Mail\TestEmail;
 
 
+Route::get('/car-share/{token}', [LeadController::class, 'publicShowcase']);
+Route::post('/car-share/{token}/confirm', [LeadController::class, 'confirmCar']);
+// Public Showcase (Bina login wala)
+Route::get('/showcase/{token}', [LeadController::class, 'publicShowcase'])->name('public.showcase');
+Route::post('/finalize-car', [LeadController::class, 'finalizeCar'])->name('finalize.car');
+
+//   Route::post('/car-share/{token}/confirm', [LeadController::class, 'confirmPublicCar']);
+
 Route::get('/send-test-mail', function () {
     Mail::to('kshitiz.ranchi@gmail.com')->send(new TestEmail());
     return "✅ Test mail sent successfully to kshitiz.ranchi@gmail.com";
-});
+});    
 
 require_once base_path('routes/role_permission.php');
 require_once base_path('routes/user.php');
@@ -235,7 +245,7 @@ Route::post('user-documents/update', [ProfileController::class, 'update']);
 Route::get('/employee_docs', [EmployeeDocumentationController::class, 'employee_docs'])->name('employee_docs');
     Route::get('/employee_documentation', [EmployeeDocumentationController::class, 'index'])
         ->name('employee_docs_page');
-
+ 
     // fetch employees list (json paginated)
     Route::get('/employee_docs_get', [EmployeeDocumentationController::class, 'getEmployees'])
         ->name('employee_docs_get');
@@ -246,7 +256,7 @@ Route::get('/employee_docs', [EmployeeDocumentationController::class, 'employee_
 
 
 
-
+ 
 
 
 // Car servicing 

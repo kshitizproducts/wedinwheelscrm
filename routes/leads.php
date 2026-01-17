@@ -27,7 +27,5 @@ Route::post('/delete_car_share_token', [LeadController::class, 'delete_car_share
 // Backend Update
 Route::post('/save_client_data_from_client', [LeadController::class, 'save_client_data_from_client']);
 
-// Public Showcase (Bina login wala)
-Route::get('/showcase/{token}', [LeadController::class, 'publicShowcase'])->name('public.showcase');
-Route::post('/finalize-car', [LeadController::class, 'finalizeCar']);
+
 });  

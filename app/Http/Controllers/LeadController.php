@@ -107,33 +107,82 @@ public function publicCars($token)
         'share' => $share
     ]);
 }
-public function confirmCar(Request $request, $token)
-{
-    $request->validate([
-        'selected_car' => 'required'
-    ]);
+// public function confirmCar(Request $request, $token)
+// {
+//     $request->validate([
+//         'selected_car' => 'required'
+//     ]);
 
-    $share = DB::selectOne("SELECT * FROM car_shares WHERE token = ?", [$token]);
-    if(!$share){
-        abort(404);
+//     $share = DB::selectOne("SELECT * FROM car_shares WHERE token = ?", [$token]);
+//     if(!$share){
+//         abort(404);
+//     }
+
+//     // update share
+//     DB::update("
+//         UPDATE car_shares 
+//         SET client_selected_car_id = ?, status = 1, updated_at = NOW()
+//         WHERE token = ?
+//     ", [$request->selected_car, $token]);
+
+//     // update lead
+//     DB::update("
+//         UPDATE leads 
+//         SET car_id = ?, status = 2, updated_at = NOW()
+//         WHERE id = ?
+//     ", [$request->selected_car, $share->lead_id]);
+
+//     return back()->with('success','Car Selected Successfully!');
+// }
+  public function confirmCar(Request $request, $token)
+    {
+        $request->validate([
+            'selected_car' => 'required'
+        ]);
+
+        $share = DB::table('car_shares')->where('token', $token)->first();
+        if (!$share) abort(404);
+
+        // ✅ already confirmed
+        if ($share->status == 1) {
+            return back()->with('already', 'Your response already recorded.');
+        }
+
+        // ✅ update car_shares
+        DB::table('car_shares')->where('token', $token)->update([
+            'client_selected_car_id' => $request->selected_car,
+            'status' => 1,
+            'updated_at' => now(),
+        ]);
+
+        // ✅ update lead
+        DB::table('leads')->where('id', $share->lead_id)->update([
+            'car_id' => $request->selected_car,
+            'status' => 2,
+            'updated_at' => now(),
+        ]);
+
+        return back()->with('success', 'Thank you! Your response has been submitted successfully.');
     }
 
-    // update share
-    DB::update("
-        UPDATE car_shares 
-        SET client_selected_car_id = ?, status = 1, updated_at = NOW()
-        WHERE token = ?
-    ", [$request->selected_car, $token]);
+public function finalizeCar(Request $request)
+{
+    $request->validate([
+        'lead_id' => 'required',
+        'car_id'  => 'required'
+    ]);
 
-    // update lead
+    // lead update final
     DB::update("
         UPDATE leads 
-        SET car_id = ?, status = 2, updated_at = NOW()
+        SET car_id = ?, status = 3, updated_at = NOW()
         WHERE id = ?
-    ", [$request->selected_car, $share->lead_id]);
+    ", [$request->car_id, $request->lead_id]);
 
-    return back()->with('success','Car Selected Successfully!');
+    return back()->with('success', '✅ Car Finalized Successfully!');
 }
+
+
 public function delete_car_share_token(Request $request)
 {
     $token = $request->token;
@@ -333,14 +382,81 @@ public function delete_car_share_token(Request $request)
 }
 
 // Public Page Logic
-public function publicShowcase($token) {
+// public function publicShowcase($token)
+// {
+//     $response = DB::table('client_responses')->where('token', $token)->first();
+//     if(!$response) abort(404);
+
+//     $lead = DB::table('leads')->where('id', $response->lead_id)->first();
+
+//     // ✅ car list
+//     $cars = DB::table('cars')->get();
+
+//     // ✅ selected car details if already responded
+//     $selectedCar = null;
+//     if($response->status == 1 && $response->selected_car_id){
+//         $selectedCar = DB::table('cars')->where('id', $response->selected_car_id)->first();
+//     }
+
+//     return view('frontend.public_showcase', compact('lead','cars','token','response','selectedCar'));
+// }
+
+
+ public function publicShowcase($token)
+    {
+        // car_shares table se token verify
+        $share = DB::table('car_shares')->where('token', $token)->first();
+        if (!$share) abort(404);
+
+        // lead details
+        $lead = DB::table('leads')->where('id', $share->lead_id)->first();
+
+        // ✅ car list sirf un cars ki jo share me hai
+        $cars = [];
+        if (!empty($share->car_ids)) {
+            $carIds = array_filter(explode(',', $share->car_ids));
+            if (count($carIds) > 0) {
+                $cars = DB::table('cars')->whereIn('id', $carIds)->get();
+            }
+        }
+
+        // ✅ selected car details (already confirmed case)
+        $selectedCar = null;
+        if ($share->status == 1 && $share->client_selected_car_id) {
+            $selectedCar = DB::table('cars')->where('id', $share->client_selected_car_id)->first();
+        }
+
+        return view('frontend.public_showcase', compact('lead', 'cars', 'token', 'share', 'selectedCar'));
+    }
+public function confirmPublicCar(Request $request, $token)
+{
+    $request->validate([
+        'selected_car' => 'required'
+    ]);
+
     $response = DB::table('client_responses')->where('token', $token)->first();
     if(!$response) abort(404);
 
-    $lead = DB::table('leads')->where('id', $response->lead_id)->first();
-    $cars = DB::table('cars')->get(); // Saari options dikhane ke liye
+    // ✅ already submitted => deny
+    if($response->status == 1){
+        return redirect()->back()->with('already', 'Your response already recorded.');
+    }
 
-    return view('frontend.public_showcase', compact('lead', 'cars', 'token'));
+    // ✅ update response table
+    DB::table('client_responses')->where('token', $token)->update([
+        'selected_car_id' => $request->selected_car,
+        'status' => 1,
+        'updated_at' => now(),
+    ]);
+
+    // ✅ update lead table optional
+    DB::table('leads')->where('id', $response->lead_id)->update([
+        'car_id' => $request->selected_car,
+        'status' => 2,
+        'updated_at' => now(),
+    ]);
+
+    return redirect()->back()->with('success', 'Thank you! Your response has been submitted successfully.');
 }
 
 
