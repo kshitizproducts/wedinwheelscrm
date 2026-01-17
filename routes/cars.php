@@ -15,7 +15,7 @@ Route::middleware(['custom_auth', 'role:Admin'])->group(function () {
  
 // Route::get('/car_status', function () {
 //     return view('backend.pages.car_status.index');
-// });  
+// });     
 
 Route::get('/cars_master', [CarsMasterController::class, 'cars_master'])->name('cars_master');
 Route::get('/car_status', [CarsMasterController::class, 'car_status'])->name('car_status');
@@ -24,9 +24,8 @@ Route::post('/update_new_cars', [CarsMasterController::class, 'update_new_cars']
 Route::post('/delete_new_cars', [CarsMasterController::class, 'delete_new_cars'])->name('delete_new_cars');
 
  
-Route::get('/update_car_profile/{id}', [CarsMasterController::class, 'update_car_profile'])->name('update_car_profile');
 
-
+ 
 Route::post('/update_profile_part1', [CarsMasterController::class, 'updateProfilePart1'])->name('update_profile_part1');
 Route::post('/update_profile_part_2', [CarsMasterController::class, 'updateProfilePart2'])->name('update_profile_part_2');
 Route::post('/add_document', [CarsMasterController::class, 'add_document'])->name('add_document');

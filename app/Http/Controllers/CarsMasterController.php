@@ -78,9 +78,9 @@ public function car_status()
         $cars = DB::table('cars')->get();
         return view('backend.pages.master.cars', compact('cars'));
     }
+    
  
- 
-    public function add_new_cars(Request $request)
+     public function add_new_cars(Request $request)
     {
         // dd($request->all());
 
@@ -187,17 +187,7 @@ public function car_status()
         return view('backend/pages/cars/profile', compact('car_data', 'car_documents', 'car_service'));
     }
 
-    public function update_car_profile($id)
-    {
-        // dd($id);
-        $car_data = DB::table('cars')->where('unique_id', $id)->first();
-        $document_master = DB::table('document_master')->get();
-        $service_master = DB::table('service_master')->get();
-        $garage_master = DB::table('garage_master')->get();
-        $doc_data = DB::table('car_documents')->where('car_id', $id)->get();
-        $car_service_data = DB::table('car_service')->where('car_id', $id)->get();
-        return view('backend/pages/cars/edit_profile', compact('id', 'car_data', 'document_master', 'doc_data', 'service_master', 'garage_master', 'car_service_data'));
-    }
+   
    
   
     public function updateProfilePart1(Request $request)

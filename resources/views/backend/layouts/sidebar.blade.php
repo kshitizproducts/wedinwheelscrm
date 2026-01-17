@@ -9,6 +9,9 @@
   </div>
 
   <nav>
+    <a href="{{ url('dashboard') }}" class="active">
+      <i class="fa-solid fa-gauge me-2"></i> Dashboard
+    </a>
    @canany(abilities: ['view drivertask ', 'view garage', 'view role', 'view inquiries', 'view lead', 'view driverschedule', 'view user', 'view cars'
    ,'view companyprofile','view HrManager' ])
     <a href="{{ url('dashboard') }}" class="active">
@@ -39,13 +42,26 @@
       <i class="fa fa-chevron-down float-end"></i>
     </h4>
 
-    <ul class="submenu">
+    <ul class="submenu"> 
       <li><a href="{{ url('users') }}"><i class="fa-solid fa-users me-2"></i> Users</a></li>
       <li><a href="{{ url('employee_docs') }}"><i class="fa-solid fa-id-card me-2"></i> Employee Documents</a></li>
     </ul>
 
  @endcan
 
+
+ @can('view HrManager')
+    <!-- SERVICING MANAGER -->
+    <h4 class="accordion-title">
+      <i class="fa-solid fa-people-group me-2"></i> MAINTAINANCE 
+      <i class="fa fa-chevron-down float-end"></i>
+    </h4>
+
+    <ul class="submenu"> 
+      <li><a href="{{ url('car_servicing') }}"><i class="fa-solid fa-users me-2"></i> Car Servicing</a></li>
+    </ul>
+
+ @endcan
 
     <!-- HR MANAGER -->
     <h4 class="accordion-title">
@@ -55,7 +71,7 @@
 
     <ul class="submenu">
       <li><a href="{{ url('driver_tasks') }}"><i class="fa-solid fa-users me-2"></i> Drivers Task</a></li>
-      <li><a href="{{ url('employee_docs') }}"><i class="fa-solid fa-id-card me-2"></i> Lead Managers</a></li>
+      <li><a href="{{ url('my_leads') }}"><i class="fa-solid fa-id-card me-2"></i> Lead Managers</a></li>
     </ul>
 
     <!-- MASTER -->

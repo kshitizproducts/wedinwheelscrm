@@ -37,7 +37,7 @@
 
 
 <!-- MODAL -->
-<div class="modal fade" id="bankModal">
+<div class="modal fade" id="bankModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content bg-dark text-white border border-warning">
 
@@ -82,7 +82,7 @@
 
                         <div class="col-md-6">
                             <label class="text-warning">QR Code</label>
-                            <input type="file" class="form-control bg-secondary text-white" name="qr_code">
+                            <input type="file" class="form-control bg-secondary text-white" name="qr_code" id="qr_code">
                         </div>
 
                         <div class="col-md-6 text-center">
@@ -95,7 +95,7 @@
                 </div>
 
                 <div class="modal-footer border-warning">
-                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
 
                     <button type="button"
                             class="btn btn-warning text-dark fw-semibold"
@@ -112,26 +112,31 @@
 
 
 <script>
-
 let modal;
 
 document.addEventListener("DOMContentLoaded", () => {
     modal = new bootstrap.Modal(document.getElementById('bankModal'));
     loadBanks();
+
+    // QR preview on choose
+    document.getElementById("qr_code").addEventListener("change", function(){
+        const file = this.files[0];
+        if(file){
+            let img = document.getElementById('qrPreview');
+            img.src = URL.createObjectURL(file);
+            img.style.display = "block";
+        }
+    });
 });
 
-
 function loadBanks() {
-
     fetch(`{{ route('financial_banking_get') }}`)
         .then(r => r.json())
         .then(r => {
-
             const tbody = document.getElementById('bankTableBody');
             tbody.innerHTML = "";
 
             r.data.forEach((b,i) => {
-
                 tbody.insertAdjacentHTML('beforeend', `
                     <tr>
                         <td>${i+1}</td>
@@ -158,8 +163,8 @@ function loadBanks() {
                 `)
             })
         })
+        .catch(()=> Swal.fire("Error", "Failed to load data", "error"))
 }
-
 
 function openModal() {
     document.getElementById('bankForm').reset();
@@ -169,9 +174,7 @@ function openModal() {
     modal.show();
 }
 
-
 function saveBank() {
-
     let formData = new FormData(document.getElementById('bankForm'));
 
     fetch(`{{ route('financial_banking_save') }}`, {
@@ -181,35 +184,54 @@ function saveBank() {
     })
     .then(r => r.json())
     .then(r => {
-        Swal.fire(r.message, "", r.success ? "success" : "error");
+        Swal.fire(r.message ?? "Done", "", r.success ? "success" : "error");
         if (r.success) {
             modal.hide();
             loadBanks();
         }
-    });
+    })
+    .catch(()=> Swal.fire("Error", "Save request failed", "error"))
 }
 
-
+/**
+ * ✅ EDIT FIX:
+ * - correct url
+ * - response parse fix
+ * - modal always open after data filled
+ */
 function editBank(id) {
+    let url = `{{ url('/financial_banking/edit') }}/${id}`;
 
-    fetch(`/financial_banking/edit/${id}`)
-        .then(r => r.json())
-        .then(r => {
+    fetch(url)
+        .then(async res => {
+            let data = await res.json().catch(()=>null);
 
-            if (!r.success || !r.data) {
-                Swal.fire("Record not found", "", "error");
+            if(!res.ok || !data){
+                Swal.fire("API Error", `Edit API failed (${res.status})`, "error");
+                console.log("Edit API failed:", res.status, data);
                 return;
             }
 
-            let b = r.data;
+            if(!data.success || !data.data){
+                Swal.fire("Not Found", data.message ?? "Record not found", "error");
+                console.log("Invalid edit response:", data);
+                return;
+            }
 
-            Object.keys(b).forEach(k => {
-                let f = document.querySelector(`[name="${k}"]`);
-                if (f) f.value = b[k] ?? '';
-            });
+            const b = data.data;
 
-            document.getElementById('id').value = b.id;
+            // form reset first
+            document.getElementById('bankForm').reset();
 
+            // fill inputs
+            document.querySelector('[name="bank_name"]').value       = b.bank_name ?? '';
+            document.querySelector('[name="account_holder"]').value  = b.account_holder ?? '';
+            document.querySelector('[name="ifsc"]').value            = b.ifsc ?? '';
+            document.querySelector('[name="account_number"]').value  = b.account_number ?? '';
+            document.querySelector('[name="upi_id"]').value          = b.upi_id ?? '';
+            document.getElementById('id').value                      = b.id ?? '';
+
+            // qr preview only
             if (b.qr_code) {
                 let img = document.getElementById('qrPreview');
                 img.src = "/" + b.qr_code;
@@ -220,25 +242,48 @@ function editBank(id) {
 
             document.getElementById('modalTitle').innerText = "Edit Bank";
 
+            // ✅ ensure modal open
             modal.show();
         })
-        .catch(() => Swal.fire("Something went wrong", "", "error"));
+        .catch((e)=>{
+            console.log("Edit fetch error:", e);
+            Swal.fire("Something went wrong", "Edit request failed", "error");
+        });
 }
 
-
+/**
+ * ✅ DELETE CONFIRMATION
+ */
 function deleteBank(id) {
 
-    fetch(`/financial_banking/delete/${id}`, {
-        method: "DELETE",
-        headers: { "X-CSRF-TOKEN": "{{ csrf_token() }}" }
-    })
-    .then(r => r.json())
-    .then(r => {
-        Swal.fire(r.message, "", r.success ? "success" : "error");
-        loadBanks();
+    Swal.fire({
+        title: "Are you sure?",
+        text: "This record will be deleted permanently!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#6c757d",
+        confirmButtonText: "Yes, Delete",
+        cancelButtonText: "Cancel",
+    }).then((result) => {
+
+        if(!result.isConfirmed) return;
+
+        let url = `{{ url('/financial_banking/delete') }}/${id}`;
+
+        fetch(url, {
+            method: "DELETE",
+            headers: { "X-CSRF-TOKEN": "{{ csrf_token() }}" }
+        })
+        .then(r => r.json())
+        .then(r => {
+            Swal.fire(r.message ?? "Deleted", "", r.success ? "success" : "error");
+            if(r.success) loadBanks();
+        })
+        .catch(()=> Swal.fire("Error", "Delete request failed", "error"));
+
     });
 }
-
 </script>
 
 @endsection

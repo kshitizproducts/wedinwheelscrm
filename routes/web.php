@@ -8,11 +8,18 @@ use App\Http\Controllers\AddressContactsController;
 use App\Http\Controllers\BasicInformationController;
 use App\Http\Controllers\FinancialBankingController;
 use App\Http\Controllers\LegalComplianceController;
+use App\Http\Controllers\EmployeeDocumentationController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\CarServicingController;
 use App\Http\Controllers\DriverTaskController;
 use Illuminate\Support\Facades\Mail;
+use App\Mail\TestEmail;
 
 
-
+Route::get('/send-test-mail', function () {
+    Mail::to('kshitiz.ranchi@gmail.com')->send(new TestEmail());
+    return "✅ Test mail sent successfully to kshitiz.ranchi@gmail.com";
+});
 
 require_once base_path('routes/role_permission.php');
 require_once base_path('routes/user.php');
@@ -94,21 +101,15 @@ Route::middleware(['custom_auth', 'role:Admin'])->group(function () {
         return view('backend.pages.master.reports');
     });
 
-   
+    
 
 
 
     
-    Route::get('/profile', function () {
-        return view('backend.profile.profile');
-    });
+ 
 
     Route::get('/edit_profile', function () {
         return view('backend.profile.edit_profile');
-    });
-
-    Route::get('/change_password', function () {
-        return view('backend.profile.change_password');
     });
 
 
@@ -172,18 +173,24 @@ Route::get('/address_contacts/edit/{id}', [AddressContactsController::class, 'ed
 Route::delete('/address_contacts/delete/{id}', [AddressContactsController::class, 'delete'])->name('address_contacts_delete');
 
 
-
+ 
 
 
 
 // financial
 
-Route::get('/financial_banking', [FinancialBankingController::class, 'index'])->name('financial_banking_index');
+// Route::get('/financial_banking', [FinancialBankingController::class, 'index'])->name('financial_banking_index');
+// Route::get('/financial_banking/get', [FinancialBankingController::class, 'get'])->name('financial_banking_get');
+// Route::post('/financial_banking/save', [FinancialBankingController::class, 'save'])->name('financial_banking_save');
+// Route::get('/financial_banking/edit/{id}', [FinancialBankingController::class, 'edit'])->name('financial_banking_edit');
+// Route::delete('/financial_banking/delete/{id}', [FinancialBankingController::class, 'delete'])->name('financial_banking_delete');
+
+Route::get('/financial_banking', [FinancialBankingController::class, 'index']);
 Route::get('/financial_banking/get', [FinancialBankingController::class, 'get'])->name('financial_banking_get');
 Route::post('/financial_banking/save', [FinancialBankingController::class, 'save'])->name('financial_banking_save');
-Route::get('/financial_banking/edit/{id}', [FinancialBankingController::class, 'edit'])->name('financial_banking_edit');
-Route::delete('/financial_banking/delete/{id}', [FinancialBankingController::class, 'delete'])->name('financial_banking_delete');
 
+Route::get('/financial_banking/edit/{id}', [FinancialBankingController::class, 'edit']);
+Route::delete('/financial_banking/delete/{id}', [FinancialBankingController::class, 'delete']);
 
  
 
@@ -212,6 +219,54 @@ Route::get(
     'driver-task-remarks/{id}',
     [DriverTaskController::class,'driver_task_remarks']
 );
+
+
+ 
+
+
+    // Route::get('/profile', function () {
+    //     return view('backend.profile.profile');
+    // });
+Route::get('/profile', [ProfileController::class, 'profile'])->name(name: 'profile');
+Route::post('profile/photo/update', [ProfileController::class, 'updatePhoto']);
+Route::post('user-documents/update', [ProfileController::class, 'update']);
+
+
+Route::get('/employee_docs', [EmployeeDocumentationController::class, 'employee_docs'])->name('employee_docs');
+    Route::get('/employee_documentation', [EmployeeDocumentationController::class, 'index'])
+        ->name('employee_docs_page');
+
+    // fetch employees list (json paginated)
+    Route::get('/employee_docs_get', [EmployeeDocumentationController::class, 'getEmployees'])
+        ->name('employee_docs_get');
+
+    // upload/update employee documents (post)
+    Route::post('/employee_docs_update', [EmployeeDocumentationController::class, 'updateDocs'])
+        ->name('employee_docs_update');
+
+
+
+
+
+
+// Car servicing 
+Route::get('/car_servicing', [CarServicingController::class, 'car_servicing'])->name('car_servicing');
+
+Route::get('/update_car_servicing/{id}', [CarServicingController::class, 'update_car_servicing'])->name('update_car_servicing');
+
+
+ 
+
+
+
+    Route::get('/change_password', function () {
+        return view('backend.profile.change_password');
+    });
+
+
+Route::post('change-password/update', [ProfileController::class, 'updatePassword']);
+
+
 
 
 });

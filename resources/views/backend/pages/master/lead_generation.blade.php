@@ -421,9 +421,13 @@
                             <div class="d-flex gap-3">
                                 <select name="status" class="form-control">
                                     <option selected disabled>Please Select</option>
-                                    <option value="1">Need to Contact</option>
-                                    <option value="2">Contacted</option>
-                                    <option value="3">Closed</option>
+                                      <option value="0">⌚ Need to Contact</option>
+                            <option value="1">✅ Client Confirmed booking</option>
+                            <option value="2">📞 Did Not pick up call</option>
+                            <option value="3">❌ Client did not respond</option>
+                            <option value="4">⏳ Client said call later</option>
+                            <option value="5">🚫 Client said not interested</option>
+                            <option value="6">📝 Other</option>
                                 </select>
                             </div>
                         </div>

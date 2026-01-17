@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>WedinWheels | Login</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  
   <style>
     body {
       margin: 0;
@@ -68,23 +70,44 @@
       letter-spacing: 1px;
     }
 
-  .login-container input {
-  width: 100%;
-  padding: 14px 16px;
-  margin: 0 0 15px 0;  /* sirf bottom margin */
-  border-radius: 10px;
-  border: 1px solid #333;
-  background: rgba(30,41,59,0.85);
-  color: #fff;
-  font-size: 16px;
-  outline: none;
-  transition: all 0.3s;
-  box-sizing: border-box; /* 👈 fix for input overflow */
-}
+    /* Password Wrapper Style */
+    .password-wrapper {
+      position: relative;
+      width: 100%;
+    }
+
+    .login-container input {
+      width: 100%;
+      padding: 14px 16px;
+      margin-bottom: 15px;
+      border-radius: 10px;
+      border: 1px solid #333;
+      background: rgba(30,41,59,0.85);
+      color: #fff;
+      font-size: 16px;
+      outline: none;
+      transition: all 0.3s;
+      box-sizing: border-box;
+    }
 
     .login-container input:focus {
       border-color: #f59e0b;
       box-shadow: 0 0 8px #f59e0b66;
+    }
+
+    /* Eye Icon Positioning */
+    .toggle-password {
+      position: absolute;
+      right: 15px;
+      top: 15px; /* input padding aur alignment ke hisab se */
+      cursor: pointer;
+      color: #aaa;
+      transition: 0.3s;
+      z-index: 10;
+    }
+
+    .toggle-password:hover {
+      color: #fbbf24;
     }
 
     .login-container button {
@@ -135,19 +158,22 @@
 </head>
 <body>
   <div class="container">
-    <!-- Left side -->
     <div class="left">
       <img src="https://wedinwheels.com/wp-content/uploads/2024/01/wedinwheels-logo.png" alt="WedinWheels Logo">
       <p>WedinWheels helps you find luxury cars for weddings and events with ease.</p>
     </div>
 
-    <!-- Right side -->
     <div class="login-container">
       <h2>Login to WedinWheels</h2>
       <form method="post" action="{{ url('login_now') }}">
         @csrf
         <input type="email" name="email" placeholder="Email Address" value="admin@gmail.com" required>
-        <input type="password" name="password" placeholder="Password" value="password" required>
+        
+        <div class="password-wrapper">
+          <input type="password" name="password" id="password" placeholder="Password" value="password" required>
+          <i class="fa-solid fa-eye toggle-password" id="eyeIcon"></i>
+        </div>
+
         <button type="submit">Login</button>
       </form>
       <div class="options">
@@ -156,5 +182,20 @@
       </div>
     </div>
   </div>
+
+  <script>
+    const passwordField = document.querySelector('#password');
+    const eyeIcon = document.querySelector('#eyeIcon');
+
+    eyeIcon.addEventListener('click', function () {
+      // Toggle the type attribute
+      const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+      passwordField.setAttribute('type', type);
+      
+      // Toggle the eye icon
+      this.classList.toggle('fa-eye');
+      this.classList.toggle('fa-eye-slash');
+    });
+  </script>
 </body>
 </html>

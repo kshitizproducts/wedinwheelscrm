@@ -53,7 +53,6 @@ class FinancialBankingController extends Controller
                     $path,
                     $id
                 ]);
-
             } else {
                 DB::update("
                     UPDATE financial_banking
@@ -97,6 +96,14 @@ class FinancialBankingController extends Controller
     public function edit($id)
     {
         $row = DB::selectOne("SELECT * FROM financial_banking WHERE id = ?", [$id]);
+
+        if (!$row) {
+            return response()->json([
+                'success' => false,
+                'data' => null,
+                'message' => 'Record not found'
+            ], 404);
+        }
 
         return response()->json([
             'success' => true,

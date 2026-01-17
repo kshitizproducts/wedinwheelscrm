@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use Illuminate\Support\Str;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -37,7 +38,112 @@ class LeadController extends Controller
 
 
 
+ 
+// public function share_available_cars(Request $request)
+// {
+//     $lead_id = $request->lead_id;
+//     $car_ids = $request->selected_cars; // array of car ids
 
+//     $token = Str::random(50);
+
+//     DB::insert("
+//         INSERT INTO car_shares (lead_id, token, car_ids, created_at, updated_at)
+//         VALUES (?, ?, ?, NOW(), NOW())
+//     ", [
+//         $lead_id,
+//         $token,
+//         json_encode($car_ids)
+//     ]);
+
+//     $url = url('/car-share/'.$token);
+
+//     return response()->json([
+//         'success' => true,
+//         'url' => $url
+//     ]);
+// }
+public function share_available_cars(Request $request)
+{
+    $lead_id = $request->lead_id;
+    $car_ids = $request->selected_cars;
+
+    $token = Str::random(50);
+
+
+    DB::insert("
+        INSERT INTO car_shares (lead_id, token, car_ids, created_at, updated_at)
+        VALUES (?, ?, ?, NOW(), NOW())
+    ", [$lead_id, $token, json_encode($car_ids)]);
+
+    $url = url('/car-share/'.$token);
+
+    return response()->json([
+        'success' => true,
+        'url' => $url,
+        'token' => $token
+    ]);
+}
+
+public function publicCars($token)
+{
+    $share = DB::selectOne("SELECT * FROM car_shares WHERE token = ?", [$token]);
+    if (!$share) {
+        abort(404, "Invalid Link");
+    }
+    $carIds = json_decode($share->car_ids, true);
+    if (!is_array($carIds) || count($carIds) == 0) {
+        $carIds = [];
+    }
+    $cars = [];
+    if (count($carIds) > 0) {
+        $placeholders = implode(',', array_fill(0, count($carIds), '?'));
+        $cars = DB::select("SELECT * FROM cars WHERE id IN ($placeholders)", $carIds);
+    }
+    $lead = DB::selectOne("SELECT * FROM leads WHERE id = ?", [$share->lead_id]);
+    return view('public.share_cars', [
+        'cars' => $cars,
+        'lead' => $lead,
+        'token' => $token,
+        'share' => $share
+    ]);
+}
+public function confirmCar(Request $request, $token)
+{
+    $request->validate([
+        'selected_car' => 'required'
+    ]);
+
+    $share = DB::selectOne("SELECT * FROM car_shares WHERE token = ?", [$token]);
+    if(!$share){
+        abort(404);
+    }
+
+    // update share
+    DB::update("
+        UPDATE car_shares 
+        SET client_selected_car_id = ?, status = 1, updated_at = NOW()
+        WHERE token = ?
+    ", [$request->selected_car, $token]);
+
+    // update lead
+    DB::update("
+        UPDATE leads 
+        SET car_id = ?, status = 2, updated_at = NOW()
+        WHERE id = ?
+    ", [$request->selected_car, $share->lead_id]);
+
+    return back()->with('success','Car Selected Successfully!');
+}
+public function delete_car_share_token(Request $request)
+{
+    $token = $request->token;
+
+    DB::delete("DELETE FROM car_shares WHERE token = ?", [$token]);
+
+    return response()->json([
+        'success' => true
+    ]);
+}
 
 
 
@@ -187,14 +293,14 @@ class LeadController extends Controller
 
  
         $un_assigned_leads = DB::table('leads')
-            ->whereNull('manager_id')->get();
+            ->whereNull('manager_id')->get(); 
 
 
         $cars = DB::table('cars')->get();
         return view('backend.pages.master.my_leads', compact('leads', 'manager_list', 'un_assigned_leads', 'cars'));
 
     }
-
+ 
 
  
  
