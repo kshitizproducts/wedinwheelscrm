@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 use Illuminate\Support\Str;
-
+use Illuminate\Support\Facades\Mail;
+use App\Mail\LeadClientMail;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -351,8 +352,38 @@ public function delete_car_share_token(Request $request)
     }
  
 
- 
- 
+   
+public function update_lead_status(Request $request)
+{
+    try {
+        $lead_id = $request->lead_id;
+        $status  = $request->choose_status;
+        $remark  = $request->remark;
+
+        $updated = DB::table('leads')
+            ->where('id', $lead_id)
+            ->update([
+                'status' => $status,
+                'remark' => $remark
+            ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Updated',
+            'updated' => $updated
+        ]);
+
+    } catch (\Exception $e) {
+
+        return response()->json([
+            'success' => false,
+            'message' => $e->getMessage(),
+            'line' => $e->getLine(),
+            'file' => $e->getFile(),
+        ], 500);
+    }
+}
+
  
  
  
@@ -457,6 +488,52 @@ public function confirmPublicCar(Request $request, $token)
     ]);
 
     return redirect()->back()->with('success', 'Thank you! Your response has been submitted successfully.');
+}
+
+public function sendLeadEmail(Request $request)
+{
+    $request->validate([
+        'lead_id' => 'required'
+    ]);
+
+    $lead = DB::table('leads')->where('id', $request->lead_id)->first();
+    if(!$lead){
+        return response()->json(['success' => false, 'message' => 'Lead not found']);
+    }
+
+    if(empty($lead->email)){
+        return response()->json(['success' => false, 'message' => 'Email not found for this lead']);
+    }
+
+    $message = $request->message ?? "We will contact you shortly regarding your booking.";
+
+    Mail::to($lead->email)->send(new LeadClientMail($lead, $message));
+
+    return response()->json([
+        'success' => true,
+        'message' => '✅ Mail sent successfully to ' . $lead->email
+    ]);
+}
+
+public function sendCarShareEmail(Request $request)
+{
+    $request->validate([
+        'lead_id' => 'required',
+        'url' => 'required'
+    ]);
+
+    $lead = DB::table('leads')->where('id', $request->lead_id)->first();
+    if(!$lead) return response()->json(['success'=>false,'message'=>'Lead not found']);
+
+    if(empty($lead->email)){
+        return response()->json(['success'=>false,'message'=>'Lead email not found']);
+    }
+
+    $msg = $request->message ?? "Please select your car from the link below:\n".$request->url;
+
+    Mail::to($lead->email)->send(new CarShareMail($lead, $request->url, $msg));
+
+    return response()->json(['success'=>true,'message'=>'Mail sent to '.$lead->email]);
 }
 
 

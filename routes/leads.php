@@ -4,7 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\LeadController;
  
 
-
+ 
 Route::middleware(['custom_auth', 'role:Admin'])->group(function () {
 
 Route::get('/my_leads', [LeadController::class, 'my_leads'])->name('my_leads');
@@ -19,6 +19,7 @@ Route::post('/assign_lead_to_manager', [LeadController::class, 'assign_lead_to_m
 Route::post('/car-share/{token}/confirm', [LeadController::class, 'confirmCar']);
 
   
+  Route::post('/update_lead_status', [LeadController::class, 'update_lead_status'])->name('update_lead_status');
   
   Route::post('/share_available_cars', [LeadController::class, 'share_available_cars']);
 Route::post('/delete_car_share_token', [LeadController::class, 'delete_car_share_token']);
@@ -26,6 +27,6 @@ Route::post('/delete_car_share_token', [LeadController::class, 'delete_car_share
    
 // Backend Update
 Route::post('/save_client_data_from_client', [LeadController::class, 'save_client_data_from_client']);
-
-
+Route::post('/lead/send-email', [LeadController::class, 'sendLeadEmail'])->name('lead.sendEmail');
+Route::post('/send-car-share-email', [LeadController::class, 'sendCarShareEmail']);
 });  

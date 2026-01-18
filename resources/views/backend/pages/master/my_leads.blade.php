@@ -72,248 +72,346 @@
                                                         <button type="button" class="btn-close btn-close-white"
                                                             data-bs-dismiss="modal" aria-label="Close"></button>
                                                     </div>
-    <form id="share_form_{{ $lead->id }}" method="post" action="{{ url('share_available_cars') }}" class="p-3">
+                                                    <form id="share_form_{{ $lead->id }}" method="post"
+                                                        action="{{ url('share_available_cars') }}" class="p-3">
 
-    @csrf
+                                                        @csrf
 
 
-    <input type="hidden" value="{{ $lead->id }}" name="lead_id">
-    <div class="modal-body">
-        <div class="row">
-          
-        </div>
+                                                        <input type="hidden" value="{{ $lead->id }}" name="lead_id">
+                                                        <div class="modal-body">
+                                                            <div class="row">
 
-        <div class="mb-3">
-            <label class="form-label text-warning">Booking Date: </label>
-            <span class="badge bg-warning text-danger px-3 py-2">
-                {{ $lead->booking_date ?? 'NA' }}
-            </span>
-        </div>
+                                                            </div>
 
-        <hr class="border-secondary">
+                                                            <div class="mb-3">
+                                                                <label class="form-label text-warning">Booking Date:
+                                                                </label>
+                                                                <span class="badge bg-warning text-danger px-3 py-2">
+                                                                    {{ $lead->booking_date ?? 'NA' }}
+                                                                </span>
+                                                            </div>
 
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="text-white mb-0">Select Available Cars ({{ count($cars) }})</h5>
-            <input type="text" id="carSearch" class="form-control form-control-sm w-50" placeholder="Search car by name or reg no...">
-        </div>
+                                                            <hr class="border-secondary">
 
-        <div class="car-selection-container" style="max-height: 500px; overflow-y: auto; overflow-x: hidden; padding-right: 5px;">
-           <div class="row" id="carList">
-    @foreach ($cars as $car)
-        @php
-            $available = empty($car->next_availability) || $car->next_availability <= $lead->booking_date;
-            $profilepublicUrl = $car->profile_pic;
-        @endphp
+                                                            <div
+                                                                class="d-flex justify-content-between align-items-center mb-3">
+                                                                <h5 class="text-white mb-0">Select Available Cars
+                                                                    ({{ count($cars) }})</h5>
+                                                                <input type="text" id="carSearch"
+                                                                    class="form-control form-control-sm w-50"
+                                                                    placeholder="Search car by name or reg no...">
+                                                            </div>
 
-        <div class="col-md-4 car-item"
-            data-name="{{ strtolower($car->brand . ' ' . $car->model . ' ' . $car->registration_no) }}">
-            
-            <div class="card mb-3 shadow-sm car-card"
-                onclick="toggleCheckbox('car_{{ $car->id }}')"
-                style="border: 1px solid {{ $available ? '#444' : '#ffc107' }}; border-radius: 12px; background-color: {{ $available ? '#2d2d2d' : '#1a1a1a' }}; cursor: pointer; transition: 0.3s;">
+                                                            <div class="car-selection-container"
+                                                                style="max-height: 500px; overflow-y: auto; overflow-x: hidden; padding-right: 5px;">
+                                                                <div class="row" id="carList">
+                                                                    @foreach ($cars as $car)
+                                                                        @php
+                                                                            $available =
+                                                                                empty($car->next_availability) ||
+                                                                                $car->next_availability <=
+                                                                                    $lead->booking_date;
+                                                                            $profilepublicUrl = $car->profile_pic;
+                                                                        @endphp
 
-                <div class="card-body p-2 text-center">
-                    <div style="position: relative;">
-                        <img src="{{ asset($profilepublicUrl) }}" alt="{{ $car->brand }}"
-                            class="img-fluid mb-2 rounded"
-                            style="height:110px; width: 100%; object-fit:cover; filter: {{ $available ? 'none' : 'grayscale(100%)' }};">
+                                                                        <div class="col-md-4 car-item"
+                                                                            data-name="{{ strtolower($car->brand . ' ' . $car->model . ' ' . $car->registration_no) }}">
 
-                        {{-- ✅ DEFAULT SELECTED --}}
-                        <input type="checkbox"
-                            class="car-checkbox"
-                            name="selected_cars[]"
-                            value="{{ $car->id }} "
-                            id="car_{{ $car->id }}"
-                            checked
-                            onclick="event.stopPropagation()"
-                            style="position: absolute; top: 10px; right: 10px; width: 20px; height: 20px; accent-color: #ffc107;">
-                    </div>
+                                                                            <div class="card mb-3 shadow-sm car-card"
+                                                                                onclick="toggleCheckbox('car_{{ $car->id }}')"
+                                                                                style="border: 1px solid {{ $available ? '#444' : '#ffc107' }}; border-radius: 12px; background-color: {{ $available ? '#2d2d2d' : '#1a1a1a' }}; cursor: pointer; transition: 0.3s;">
 
-                    <h6 class="mb-1 fw-bold {{ $available ? 'text-white' : 'text-warning' }}" style="font-size: 0.9rem;">
-                        {{ $car->brand }} {{ $car->model }}
-                    </h6>
+                                                                                <div class="card-body p-2 text-center">
+                                                                                    <div style="position: relative;">
+                                                                                        <img src="{{ asset($profilepublicUrl) }}"
+                                                                                            alt="{{ $car->brand }}"
+                                                                                            class="img-fluid mb-2 rounded"
+                                                                                            style="height:110px; width: 100%; object-fit:cover; filter: {{ $available ? 'none' : 'grayscale(100%)' }};">
 
-                    <small class="text-muted d-block" style="font-size: 0.75rem;">{{ $car->registration_no }}</small>
+                                                                                        {{-- ✅ DEFAULT SELECTED --}}
+                                                                                        <input type="checkbox"
+                                                                                            class="car-checkbox"
+                                                                                            name="selected_cars[]"
+                                                                                            value="{{ $car->id }} "
+                                                                                            id="car_{{ $car->id }}"
+                                                                                            checked
+                                                                                            onclick="event.stopPropagation()"
+                                                                                            style="position: absolute; top: 10px; right: 10px; width: 20px; height: 20px; accent-color: #ffc107;">
+                                                                                    </div>
 
-                    @if ($available)
-                        <span class="badge bg-success-subtle text-success mt-1" style="font-size: 0.7rem;">Available</span>
-                    @else
-                        <span class="badge bg-danger-subtle text-danger mt-1" style="font-size: 0.7rem;">Engaged</span>
-                        <div class="mt-1">
-                            <small class="text-warning" style="font-size: 0.65rem;">
-                                Until: <strong>{{ date('d M', strtotime($car->next_availability)) }}</strong>
-                            </small>
-                        </div>
-                    @endif
+                                                                                    <h6 class="mb-1 fw-bold {{ $available ? 'text-white' : 'text-warning' }}"
+                                                                                        style="font-size: 0.9rem;">
+                                                                                        {{ $car->brand }}
+                                                                                        {{ $car->model }}
+                                                                                    </h6>
 
-                </div>
-            </div>
-        </div>
-    @endforeach
-</div>
+                                                                                    <small class="text-muted d-block"
+                                                                                        style="font-size: 0.75rem;">{{ $car->registration_no }}</small>
 
-        </div>
-    </div>
+                                                                                    @if ($available)
+                                                                                        <span
+                                                                                            class="badge bg-success-subtle text-success mt-1"
+                                                                                            style="font-size: 0.7rem;">Available</span>
+                                                                                    @else
+                                                                                        <span
+                                                                                            class="badge bg-danger-subtle text-danger mt-1"
+                                                                                            style="font-size: 0.7rem;">Engaged</span>
+                                                                                        <div class="mt-1">
+                                                                                            <small class="text-warning"
+                                                                                                style="font-size: 0.65rem;">
+                                                                                                Until:
+                                                                                                <strong>{{ date('d M', strtotime($car->next_availability)) }}</strong>
+                                                                                            </small>
+                                                                                        </div>
+                                                                                    @endif
 
-    <div class="modal-footer justify-content-center border-top border-warning bg-dark">
-       
-        
-        <button type="button" onclick="generateShareLink({{ $lead->id }})"
-    class="btn btn-outline-light px-4" style="border-radius:30px;">
-    Generate Link
-</button>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    @endforeach
+                                                                </div>
 
-    </div>
-</form>
+                                                            </div>
+                                                        </div>
 
-<style>
-    /* Scrollbar styling for a better dark look */
-    .car-selection-container::-webkit-scrollbar { width: 6px; }
-    .car-selection-container::-webkit-scrollbar-track { background: #1a1a1a; }
-    .car-selection-container::-webkit-scrollbar-thumb { background: #ffc107; border-radius: 10px; }
-    .car-card:hover { transform: translateY(-3px); border-color: #ffc107 !important; }
-</style>
-<script>
-function generateShareLink(leadId) {
+                                                        <div
+                                                            class="modal-footer justify-content-center border-top border-warning bg-dark">
 
-    let form = document.getElementById("share_form_" + leadId);
-    let formData = new FormData(form);
 
-    fetch("{{ url('share_available_cars') }}", {
-        method: "POST",
-        body: formData,
-        headers: {
-            "X-CSRF-TOKEN": "{{ csrf_token() }}"
-        }
-    })
-    .then(res => res.json())
-    .then(data => {
-        if(data.success){
+                                                            <button type="button"
+                                                                onclick="generateShareLink({{ $lead->id }})"
+                                                                class="btn btn-outline-light px-4"
+                                                                style="border-radius:30px;">
+                                                                Generate Link
+                                                            </button>
 
-            let url = data.url;
-            let token = data.token;
-            let shared = false; // ✅ track if clicked on whatsapp/email
+                                                        </div>
+                                                    </form>
 
-            Swal.fire({
-                title: "✅ Share Link Generated",
-                html: `
+                                                    <style>
+                                                        /* Scrollbar styling for a better dark look */
+                                                        .car-selection-container::-webkit-scrollbar {
+                                                            width: 6px;
+                                                        }
+
+                                                        .car-selection-container::-webkit-scrollbar-track {
+                                                            background: #1a1a1a;
+                                                        }
+
+                                                        .car-selection-container::-webkit-scrollbar-thumb {
+                                                            background: #ffc107;
+                                                            border-radius: 10px;
+                                                        }
+
+                                                        .car-card:hover {
+                                                            transform: translateY(-3px);
+                                                            border-color: #ffc107 !important;
+                                                        }
+                                                    </style>
+                                                    <script>
+                                                        function generateShareLink(leadId) {
+
+                                                            let form = document.getElementById("share_form_" + leadId);
+                                                            let formData = new FormData(form);
+
+                                                            fetch("{{ url('share_available_cars') }}", {
+                                                                    method: "POST",
+                                                                    body: formData,
+                                                                    headers: {
+                                                                        "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                                                                    }
+                                                                })
+                                                                .then(res => res.json())
+                                                                .then(data => {
+                                                                    if (data.success) {
+
+                                                                        let url = data.url;
+                                                                        let token = data.token;
+                                                                        let shared = false; // ✅ track if clicked on whatsapp/email
+
+                                                                        Swal.fire({
+                                                                            title: "✅ Share Link Generated",
+                                                                            html: `
                     <div style="text-align:left;">
                         <b>Share this link:</b><br>
                         <input id="shareLinkInput" class="form-control mt-2" value="${url}" readonly>
                         <small class="text-muted">Copy and share to client</small>
                     </div>
                 `,
-                icon: "success",
-                showCancelButton: true,
-                cancelButtonText: "Close",
-                confirmButtonText: "WhatsApp",
-                denyButtonText: "Email",
-                showDenyButton: true,
-                allowOutsideClick: true,
-                didOpen: () => {
-                    // auto select input
-                    document.getElementById("shareLinkInput").addEventListener("click", function(){
-                        this.select();
-                    });
-                }
-            }).then((result) => {
+                                                                            icon: "success",
+                                                                            showCancelButton: true,
+                                                                            cancelButtonText: "Close",
+                                                                            confirmButtonText: "WhatsApp",
+                                                                            denyButtonText: "Email",
+                                                                            showDenyButton: true,
+                                                                            allowOutsideClick: true,
+                                                                            didOpen: () => {
+                                                                                // auto select input
+                                                                                document.getElementById("shareLinkInput").addEventListener("click",
+                                                                                    function() {
+                                                                                        this.select();
+                                                                                    });
+                                                                            }
+                                                                        }).then((result) => {
 
-                if(result.isConfirmed){
-                    shared = true;
-                    // ✅ WhatsApp share
-                    window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent("Please select car: " + url), "_blank");
-                }
-                else if(result.isDenied){
-                    shared = true;
-                    // ✅ Email share
-                    window.location.href = "mailto:?subject=Select Car&body=" + encodeURIComponent("Please select your car from: " + url);
-                }
+                                                                            if (result.isConfirmed) {
+                                                                                shared = true;
+                                                                                // ✅ WhatsApp share
+                                                                                window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(
+                                                                                    "Please select car: " + url), "_blank");
+                                                                            } else if (result.isDenied) {
+                                                                                shared = true;
 
-                // ✅ If not shared, delete token record
-                if(!shared){
-                    deleteToken(token);
-                }
-            });
+                                                                                // ✅ send mail from Laravel with dark template
+                                                                                sendCarShareEmail(leadId, url, token);
+                                                                            }
 
-            // ✅ If user clicks outside / presses ESC / closes alert
-            Swal.getPopup()?.addEventListener('mouseleave', function(){
-                // nothing
-            });
+                                                                            // ✅ If not shared, delete token record
+                                                                            if (!shared) {
+                                                                                deleteToken(token);
+                                                                            }
+                                                                        });
 
-        } else {
-            Swal.fire("Error", data.message || "Something went wrong!", "error");
-        }
-    })
-    .catch(err => {
-        console.log(err);
-        Swal.fire("Error", "Network error!", "error");
-    });
-}
+                                                                        // ✅ If user clicks outside / presses ESC / closes alert
+                                                                        Swal.getPopup()?.addEventListener('mouseleave', function() {
+                                                                            // nothing
+                                                                        });
 
-// ✅ delete token ajax
-function deleteToken(token){
-    fetch("{{ url('delete_car_share_token') }}", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "X-CSRF-TOKEN": "{{ csrf_token() }}"
-        },
-        body: JSON.stringify({ token: token })
-    })
-    .then(res => res.json())
-    .then(data => {
-        console.log("Token deleted:", token);
-    });
-}
-</script>
+                                                                    } else {
+                                                                        Swal.fire("Error", data.message || "Something went wrong!", "error");
+                                                                    }
+                                                                })
+                                                                .catch(err => {
+                                                                    console.log(err);
+                                                                    Swal.fire("Error", "Network error!", "error");
+                                                                });
+                                                        }
 
-<script>
-    // 1. Search Logic
-    document.getElementById('carSearch').addEventListener('keyup', function() {
-        let filter = this.value.toLowerCase();
-        let items = document.querySelectorAll('.car-item');
-        items.forEach(item => {
-            if (item.getAttribute('data-name').includes(filter)) {
-                item.style.display = "";
-            } else {
-                item.style.display = "none";
-            }
-        });
-    });
+                                                        // ✅ delete token ajax
+                                                        function deleteToken(token) {
+                                                            fetch("{{ url('delete_car_share_token') }}", {
+                                                                    method: "POST",
+                                                                    headers: {
+                                                                        "Content-Type": "application/json",
+                                                                        "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                                                                    },
+                                                                    body: JSON.stringify({
+                                                                        token: token
+                                                                    })
+                                                                })
+                                                                .then(res => res.json())
+                                                                .then(data => {
+                                                                    console.log("Token deleted:", token);
+                                                                });
+                                                        }
+                                                    </script>
+                                                    <script>
+                                                        function sendCarShareEmail(leadId, url, token) {
 
-    // 2. Click on Card to Checkbox
-    function toggleCheckbox(id) {
-        const cb = document.getElementById(id);
-        cb.checked = !cb.checked;
-    }
+                                                            Swal.fire({
+                                                                title: "Send Email to Client",
+                                                                html: `
+            <div style="text-align:left;">
+                <b>Message:</b>
+                <textarea id="mailMsg" class="form-control mt-2" rows="6"
+                    placeholder="Type message...">Please select your car from the link below:\n${url}</textarea>
+            </div>
+        `,
+                                                                icon: "question",
+                                                                showCancelButton: true,
+                                                                confirmButtonText: "✅ Send",
+                                                                cancelButtonText: "Cancel",
+                                                                preConfirm: () => document.getElementById("mailMsg").value
+                                                            }).then((result) => {
 
-    // 3. Get Selected Cars Text
-    function getSelectedCars() {
-        let selected = [];
-        document.querySelectorAll('.car-checkbox:checked').forEach(cb => {
-            selected.push(cb.value);
-        });
-        return selected;
-    }
+                                                                if (!result.isConfirmed) {
+                                                                    // if user cancel, delete token
+                                                                    deleteToken(token);
+                                                                    return;
+                                                                }
 
-    // 4. WhatsApp Share
-    function shareViaWhatsApp() {
-        let cars = getSelectedCars();
-        if (cars.length === 0) { alert('Please select at least one car'); return; }
-        
-        let text = "Hello, here are the available car details:\n\n" + cars.join("\n") + "\n\nRegards.";
-        window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(text), "_blank");
-    }
+                                                                fetch("{{ url('send-car-share-email') }}", {
+                                                                        method: "POST",
+                                                                        headers: {
+                                                                            "Content-Type": "application/json",
+                                                                            "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                                                                        },
+                                                                        body: JSON.stringify({
+                                                                            lead_id: leadId,
+                                                                            url: url,
+                                                                            message: result.value
+                                                                        })
+                                                                    })
+                                                                    .then(res => res.json())
+                                                                    .then(data => {
+                                                                        if (data.success) {
+                                                                            Swal.fire("✅ Sent", data.message, "success");
+                                                                        } else {
+                                                                            Swal.fire("Error", data.message || "Mail sending failed!", "error");
+                                                                        }
+                                                                    })
+                                                                    .catch(err => {
+                                                                        console.log(err);
+                                                                        Swal.fire("Error", "Network error!", "error");
+                                                                    });
+                                                            });
+                                                        }
+                                                    </script>
 
-    // 5. Email Share
-    function shareViaEmail() {
-        let cars = getSelectedCars();
-        if (cars.length === 0) { alert('Please select at least one car'); return; }
-        
-        let body = "Hello,\n\nRequested car details:\n" + cars.join("\n");
-        window.location.href = "mailto:?subject=Available Car Details&body=" + encodeURIComponent(body);
-    }
-</script>
+                                                    <script>
+                                                        // 1. Search Logic
+                                                        document.getElementById('carSearch').addEventListener('keyup', function() {
+                                                            let filter = this.value.toLowerCase();
+                                                            let items = document.querySelectorAll('.car-item');
+                                                            items.forEach(item => {
+                                                                if (item.getAttribute('data-name').includes(filter)) {
+                                                                    item.style.display = "";
+                                                                } else {
+                                                                    item.style.display = "none";
+                                                                }
+                                                            });
+                                                        });
+
+                                                        // 2. Click on Card to Checkbox
+                                                        function toggleCheckbox(id) {
+                                                            const cb = document.getElementById(id);
+                                                            cb.checked = !cb.checked;
+                                                        }
+
+                                                        // 3. Get Selected Cars Text
+                                                        function getSelectedCars() {
+                                                            let selected = [];
+                                                            document.querySelectorAll('.car-checkbox:checked').forEach(cb => {
+                                                                selected.push(cb.value);
+                                                            });
+                                                            return selected;
+                                                        }
+
+                                                        // 4. WhatsApp Share
+                                                        function shareViaWhatsApp() {
+                                                            let cars = getSelectedCars();
+                                                            if (cars.length === 0) {
+                                                                alert('Please select at least one car');
+                                                                return;
+                                                            }
+
+                                                            let text = "Hello, here are the available car details:\n\n" + cars.join("\n") + "\n\nRegards.";
+                                                            window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(text), "_blank");
+                                                        }
+
+                                                        // 5. Email Share
+                                                        function shareViaEmail() {
+                                                            let cars = getSelectedCars();
+                                                            if (cars.length === 0) {
+                                                                alert('Please select at least one car');
+                                                                return;
+                                                            }
+
+                                                            let body = "Hello,\n\nRequested car details:\n" + cars.join("\n");
+                                                            window.location.href = "mailto:?subject=Available Car Details&body=" + encodeURIComponent(body);
+                                                        }
+                                                    </script>
                                                 </div>
                                             </div>
                                         </div>
@@ -335,16 +433,24 @@ function deleteToken(token){
                                     <td>
                                         @php
                                             $lead_status = $lead->status;
-                                            if ($lead_status == 1) {
-                                                echo "<span class='badge bg-info text-dark'>Need to Contact</span>";
+
+                                            if ($lead_status == 0) {
+                                                echo "<span class='badge bg-info text-dark'>⌚ Need to Contact</span>";
+                                            } elseif ($lead_status == 1) {
+                                                echo "<span class='badge bg-success text-dark'>✅ Client Confirmed Booking</span>";
                                             } elseif ($lead_status == 2) {
-                                                echo "<span class='badge bg-success text-dark'>Contacted</span>";
+                                                echo "<span class='badge bg-warning text-dark'>📞 Did Not Pick Up Call</span>";
                                             } elseif ($lead_status == 3) {
-                                                echo "<span class='badge bg-secondary text-dark'>Closed</span>";
+                                                echo "<span class='badge bg-secondary text-white'>❌ Client Did Not Respond</span>";
+                                            } elseif ($lead_status == 4) {
+                                                echo "<span class='badge bg-primary text-white'>⏳ Client Said Call Later</span>";
+                                            } elseif ($lead_status == 5) {
+                                                echo "<span class='badge bg-danger text-white'>🚫 Client Said Not Interested</span>";
                                             } else {
                                                 echo "<span class='badge bg-dark text-light'>NA</span>";
                                             }
                                         @endphp
+
 
                                     </td>
 
@@ -356,119 +462,136 @@ function deleteToken(token){
 
 
 
-                                     <div class="modal fade" id="updatedlead{{ $lead->id }}" tabindex="-1"
-    aria-labelledby="updatedlead{{ $lead->id }}Label" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content border-0 shadow-lg"
-            style="background:#0f1115; color:#fff; border-radius:18px; overflow:hidden;">
+                                        <div class="modal fade" id="updatedlead{{ $lead->id }}" tabindex="-1"
+                                            aria-labelledby="updatedlead{{ $lead->id }}Label" aria-hidden="true">
+                                            <div
+                                                class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+                                                <div class="modal-content border-0 shadow-lg"
+                                                    style="background:#0f1115; color:#fff; border-radius:18px; overflow:hidden;">
 
-            {{-- Header --}}
-            <div class="modal-header px-4 py-3"
-                style="background:#141824; border-bottom:1px solid #2a2f3b;">
-                <div>
-                    <h5 class="modal-title text-warning fw-bold mb-0" id="updatedlead{{ $lead->id }}Label">
-                        Update Lead Status
-                    </h5>
-                    <small class="text-white">Client: <b class="text-white">{{ $lead->client_name }}</b></small>
-                </div>
+                                                    {{-- Header --}}
+                                                    <div class="modal-header px-4 py-3"
+                                                        style="background:#141824; border-bottom:1px solid #2a2f3b;">
+                                                        <div>
+                                                            <h5 class="modal-title text-warning fw-bold mb-0"
+                                                                id="updatedlead{{ $lead->id }}Label">
+                                                                Update Lead Status
+                                                            </h5>
+                                                            <small class="text-white">Client: <b
+                                                                    class="text-white">{{ $lead->client_name }}</b></small>
+                                                        </div>
 
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                    aria-label="Close"></button>
-            </div>
+                                                        <button type="button" class="btn-close btn-close-white"
+                                                            data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
 
-            {{-- Body --}}
-            <div class="modal-body px-4 py-4">
+                                                    {{-- Body --}}
+                                                    <div class="modal-body px-4 py-4">
 
-                <form id="lead_status_form_{{ $lead->id }}" method="post" action="{{ url('update_lead_status') }}">
-                    @csrf
-                    <input type="hidden" name="lead_id" value="{{ $lead->id }}">
+                                                        <form id="lead_status_form_{{ $lead->id }}" method="post"
+                                                            action="{{ url('update_lead_status') }}">
+                                                            @csrf
+                                                            <input type="hidden" name="lead_id"
+                                                                value="{{ $lead->id }}">
 
-                    {{-- Status --}}
-                    <div class="mb-3">
-                        <label class="form-label text-warning fw-semibold mb-1">
-                            What is Status?
-                        </label>
+                                                            {{-- Status --}}
+                                                            <div class="mb-3">
+                                                                <label class="form-label text-warning fw-semibold mb-1">
+                                                                    What is Status?
+                                                                </label>
 
-                        <select name="choose_status"
-                            class="form-select text-white border-0"
-                            style="background:#1c2230; border-radius:12px; padding:12px;">
-                            <option selected disabled>-- Please Select --</option>
-                             <option value="0">⌚ Need to Contact</option>
-                            <option value="1">✅ Client Confirmed booking</option>
-                            <option value="2">📞 Did Not pick up call</option>
-                            <option value="3">❌ Client did not respond</option>
-                            <option value="4">⏳ Client said call later</option>
-                            <option value="5">🚫 Client said not interested</option>
-                            <option value="6">📝 Other</option>
-                        </select>
-                    </div>
+                                                                <select name="choose_status"
+                                                                    class="form-select text-white border-0"
+                                                                    style="background:#1c2230; border-radius:12px; padding:12px;">
+                                                                    <option selected disabled>-- Please Select --</option>
+                                                                    <option value="0">⌚ Need to Contact</option>
+                                                                    <option value="1">✅ Client Confirmed booking
+                                                                    </option>
+                                                                    <option value="2">📞 Did Not pick up call</option>
+                                                                    <option value="3">❌ Client did not respond
+                                                                    </option>
+                                                                    <option value="4">⏳ Client said call later
+                                                                    </option>
+                                                                    <option value="5">🚫 Client said not interested
+                                                                    </option>
+                                                                    <option value="6">📝 Other</option>
+                                                                </select>
+                                                            </div>
 
-                    {{-- Remark --}}
-                    <div class="mb-3">
-                        <label class="form-label text-warning fw-semibold mb-1">
-                            Remark
-                        </label>
-                        <textarea name="remark"
-                            rows="4"
-                            class="form-control text-white border-0"
-                            style="background:#1c2230; border-radius:12px; padding:12px;"
-                            placeholder="Write remark..."></textarea>
-                    </div>
+                                                            {{-- Remark --}}
+                                                            <div class="mb-3">
+                                                                <label class="form-label text-warning fw-semibold mb-1">
+                                                                    Remark
+                                                                </label>
+                                                                <textarea name="remark" rows="4" class="form-control text-white border-0"
+                                                                    style="background:#1c2230; border-radius:12px; padding:12px;" placeholder="Write remark..."></textarea>
+                                                            </div>
 
-                </form>
+                                                        </form>
 
-            </div>
+                                                    </div>
 
-            {{-- Footer --}}
-            <div class="modal-footer px-4 py-3"
-                style="background:#141824; border-top:1px solid #2a2f3b;">
-                <button type="button" class="btn btn-outline-light px-4"
-                    style="border-radius:999px;" data-bs-dismiss="modal">
-                    Cancel
-                </button>
+                                                    {{-- Footer --}}
+                                                    <div class="modal-footer px-4 py-3"
+                                                        style="background:#141824; border-top:1px solid #2a2f3b;">
+                                                        <button type="button" class="btn btn-outline-light px-4"
+                                                            style="border-radius:999px;" data-bs-dismiss="modal">
+                                                            Cancel
+                                                        </button>
 
-                <button type="button" onclick="submitLeadStatus({{ $lead->id }})"
-                    class="btn btn-warning text-dark fw-bold px-4"
-                    style="border-radius:999px;">
-                    Update
-                </button>
-            </div>
+                                                        <button type="button"
+                                                            onclick="submitLeadStatus({{ $lead->id }})"
+                                                            class="btn btn-warning text-dark fw-bold px-4"
+                                                            style="border-radius:999px;">
+                                                            Update
+                                                        </button>
+                                                    </div>
 
-        </div>
-    </div>
-</div>
+                                                </div>
+                                            </div>
+                                        </div>
 
-<script>
-function submitLeadStatus(leadId){
-    const form = document.getElementById('lead_status_form_' + leadId);
-    const formData = new FormData(form);
+                                        <script>
+                                            function submitLeadStatus(leadId) {
+                                                const form = document.getElementById('lead_status_form_' + leadId);
+                                                const formData = new FormData(form);
 
-    fetch("{{ url('update_lead_status') }}", {
-        method: "POST",
-        body: formData,
-        headers: {
-            "X-CSRF-TOKEN": "{{ csrf_token() }}"
-        }
-    })
-    .then(res => res.json())
-    .then(data => {
-        if(data.success){
-            Swal.fire({
-                icon: 'success',
-                title: 'Updated!',
-                showConfirmButton: false,
-                timer: 1200
-            }).then(()=>location.reload());
-        }else{
-            Swal.fire("Error", data.message || "Something went wrong!", "error");
-        }
-    })
-    .catch(err=>{
-        console.log(err);
-        Swal.fire("Error", "Network error!", "error");
-    });
-}
-</script>
+                                                fetch("{{ url('update_lead_status') }}", {
+                                                        method: "POST",
+                                                        body: formData,
+                                                        headers: {
+                                                            "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                                                            "Accept": "application/json"
+                                                        }
+                                                    })
+                                                    .then(async (res) => {
+                                                        let data;
+                                                        try {
+                                                            data = await res.json();
+                                                        } catch (e) {
+                                                            throw new Error("Server did not return JSON. Status: " + res.status);
+                                                        }
+                                                        return data;
+                                                    })
+                                                    .then(data => {
+                                                        if (data.success) {
+                                                            Swal.fire({
+                                                                icon: 'success',
+                                                                title: 'Updated!',
+                                                                showConfirmButton: false,
+                                                                timer: 1200
+                                                            }).then(() => location.reload());
+                                                        } else {
+                                                            Swal.fire("Error", data.message || "Something went wrong!", "error");
+                                                        }
+                                                    })
+                                                    .catch(err => {
+                                                        console.log(err);
+                                                        Swal.fire("Error", err.message || "Network error!", "error");
+                                                    });
+
+                                            }
+                                        </script>
 
                                     </td>
                                     <script src="{{ asset('backend/js/sweetalert2.min.js') }}"></script>
