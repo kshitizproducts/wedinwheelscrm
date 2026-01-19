@@ -28,5 +28,11 @@ Route::post('/delete_car_share_token', [LeadController::class, 'delete_car_share
 // Backend Update
 Route::post('/save_client_data_from_client', [LeadController::class, 'save_client_data_from_client']);
 Route::post('/lead/send-email', [LeadController::class, 'sendLeadEmail'])->name('lead.sendEmail');
-Route::post('/send-car-share-email', [LeadController::class, 'sendCarShareEmail']);
+// Route::post('/send-car-share-email', [LeadController::class, 'sendCarShareEmail']);
+
+Route::post('/send-car-share-email', [LeadController::class, 'sendCarShareEmail'])
+    ->name('send.car.share.email');
+
+
+
 });  

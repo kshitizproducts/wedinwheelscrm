@@ -306,58 +306,89 @@
                                                                 });
                                                         }
                                                     </script>
-                                                    <script>
-                                                        function sendCarShareEmail(leadId, url, token) {
+                                               <script>
+function sendCarShareEmail(leadId, url, token) {
 
-                                                            Swal.fire({
-                                                                title: "Send Email to Client",
-                                                                html: `
+    Swal.fire({
+        title: "Send Email to Client",
+        html: `
             <div style="text-align:left;">
                 <b>Message:</b>
                 <textarea id="mailMsg" class="form-control mt-2" rows="6"
                     placeholder="Type message...">Please select your car from the link below:\n${url}</textarea>
             </div>
         `,
-                                                                icon: "question",
-                                                                showCancelButton: true,
-                                                                confirmButtonText: "✅ Send",
-                                                                cancelButtonText: "Cancel",
-                                                                preConfirm: () => document.getElementById("mailMsg").value
-                                                            }).then((result) => {
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: "✅ Send",
+        cancelButtonText: "Cancel",
+        preConfirm: () => document.getElementById("mailMsg").value
+    }).then(async (result) => {
 
-                                                                if (!result.isConfirmed) {
-                                                                    // if user cancel, delete token
-                                                                    deleteToken(token);
-                                                                    return;
-                                                                }
+        if (!result.isConfirmed) {
+            // user cancelled → delete token
+            deleteToken(token);
+            return;
+        }
 
-                                                                fetch("{{ url('send-car-share-email') }}", {
-                                                                        method: "POST",
-                                                                        headers: {
-                                                                            "Content-Type": "application/json",
-                                                                            "X-CSRF-TOKEN": "{{ csrf_token() }}"
-                                                                        },
-                                                                        body: JSON.stringify({
-                                                                            lead_id: leadId,
-                                                                            url: url,
-                                                                            message: result.value
-                                                                        })
-                                                                    })
-                                                                    .then(res => res.json())
-                                                                    .then(data => {
-                                                                        if (data.success) {
-                                                                            Swal.fire("✅ Sent", data.message, "success");
-                                                                        } else {
-                                                                            Swal.fire("Error", data.message || "Mail sending failed!", "error");
-                                                                        }
-                                                                    })
-                                                                    .catch(err => {
-                                                                        console.log(err);
-                                                                        Swal.fire("Error", "Network error!", "error");
-                                                                    });
-                                                            });
-                                                        }
-                                                    </script>
+        // ✅ loader popup
+        Swal.fire({
+            title: "Sending...",
+            text: "Please wait",
+            allowOutsideClick: false,
+            didOpen: () => Swal.showLoading()
+        });
+
+        try {
+            const response = await fetch("{{ url('send-car-share-email') }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json",   // ✅ important (Laravel JSON response)
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                },
+                body: JSON.stringify({
+                    lead_id: leadId,
+                    url: url,
+                    message: result.value
+                })
+            });
+
+            // ✅ if server returns HTML/500, get text first
+            const text = await response.text();
+
+            let data = {};
+            try {
+                data = JSON.parse(text);
+            } catch (e) {
+                console.log("Non-JSON response:", text);
+                Swal.fire("Error", "Server returned invalid response!", "error");
+                return;
+            }
+
+            if (!response.ok) {
+                // Laravel validation error case
+                let msg = data.message || "Mail sending failed!";
+                if (data.errors) {
+                    msg = Object.values(data.errors).flat().join("<br>");
+                }
+                Swal.fire("Error", msg, "error");
+                return;
+            }
+
+            if (data.success) {
+                Swal.fire("✅ Sent", data.message, "success");
+            } else {
+                Swal.fire("Error", data.message || "Mail sending failed!", "error");
+            }
+
+        } catch (err) {
+            console.log(err);
+            Swal.fire("Error", "Network / Server error!", "error");
+        }
+    });
+}
+</script>
 
                                                     <script>
                                                         // 1. Search Logic

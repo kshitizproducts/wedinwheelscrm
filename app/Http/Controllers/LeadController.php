@@ -7,6 +7,7 @@ use App\Mail\LeadClientMail;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Mail\CarShareMail;
 class LeadController extends Controller
 {
     // 
@@ -515,29 +516,55 @@ public function sendLeadEmail(Request $request)
     ]);
 }
 
+
+
+
 public function sendCarShareEmail(Request $request)
 {
+    // ❌ dd($request->all());   // REMOVE THIS
+
+    // ✅ Validate
     $request->validate([
-        'lead_id' => 'required',
-        'url' => 'required'
+        'lead_id' => 'required|integer',
+        'url'     => 'required',
+        'message' => 'nullable|string'
     ]);
 
     $lead = DB::table('leads')->where('id', $request->lead_id)->first();
-    if(!$lead) return response()->json(['success'=>false,'message'=>'Lead not found']);
 
-    if(empty($lead->email)){
-        return response()->json(['success'=>false,'message'=>'Lead email not found']);
+    if (!$lead) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Lead not found'
+        ], 404);
     }
 
-    $msg = $request->message ?? "Please select your car from the link below:\n".$request->url;
+    if (empty($lead->email)) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Lead email not found'
+        ], 422);
+    }
 
-    Mail::to($lead->email)->send(new CarShareMail($lead, $request->url, $msg));
+    $msg = $request->message ?? ("Please select your car from the link below:\n" . $request->url);
 
-    return response()->json(['success'=>true,'message'=>'Mail sent to '.$lead->email]);
+    try {
+        Mail::to($lead->email)->send(new CarShareMail($lead, $request->url, $msg));
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Mail sent successfully to ' . $lead->email
+        ]);
+    } catch (\Throwable $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Mail sending failed',
+            'error'   => $e->getMessage()   // optional: debug
+        ], 500);
+    }
 }
 
-
-
+  
 
 
 }
