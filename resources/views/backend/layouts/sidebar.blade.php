@@ -9,9 +9,7 @@
   </div>
 
   <nav>
-    <a href="{{ url('dashboard') }}" class="active">
-      <i class="fa-solid fa-gauge me-2"></i> Dashboard
-    </a>
+ 
    @canany(abilities: ['view drivertask ', 'view garage', 'view role', 'view inquiries', 'view lead', 'view driverschedule', 'view user', 'view cars'
    ,'view companyprofile','view HrManager' ])
     <a href="{{ url('dashboard') }}" class="active">
@@ -116,13 +114,18 @@
 
 
     <!-- SETTINGS -->
-    <h4>Settings</h4>
+ 
+    
 
-    <a href="{{ url('roles') }}"><i class="fa-solid fa-user-shield me-2"></i> Roles</a>
+ <h4 class="accordion-title">
+      <i class="fa-solid fa-building me-2"></i> Settings
+      <i class="fa fa-chevron-down float-end"></i>
+    </h4> 
+    <ul class="submenu">
+      <a href="{{ url('roles') }}"><i class="fa-solid fa-user-shield me-2"></i> Roles</a>
     <a href="{{ url('permission') }}"><i class="fa-solid fa-lock me-2"></i> Permissions</a>
+    </ul>
     <a href="{{ url('logout') }}"><i class="fa-solid fa-right-from-bracket me-2"></i> Logout</a>
-
-
 
  @endcanany
   </nav>

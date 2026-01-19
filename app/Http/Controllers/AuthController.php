@@ -83,4 +83,20 @@ class AuthController extends Controller
 
         return redirect('/login')->with('success', 'Account created! Please login.');
     }
+
+
+    public function reset_password()
+    {
+        return view('auth.reset_password');
+    }
+
+
+
+
+
+
+
+
+
+
 }

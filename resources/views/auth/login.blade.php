@@ -177,8 +177,7 @@
         <button type="submit">Login</button>
       </form>
       <div class="options">
-        <p>Forgot Password? <a href="#">Click here</a></p>
-        <p>Don't have an account? <a href="#">Register</a></p>
+        <p>Forgot Password? <a href="{{ url('reset_password') }}">Click here</a></p>
       </div>
     </div>
   </div>

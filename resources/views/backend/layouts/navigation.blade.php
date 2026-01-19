@@ -8,10 +8,25 @@
 
   <!-- Profile Dropdown -->
   <div class="dropdown ms-3">
-    <div class="profile d-flex align-items-center dropdown-toggle" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="cursor:pointer;">
-      <img src="https://i.pravatar.cc/40" alt="Avatar" class="rounded-circle me-2" width="35" height="35">
-      <span>Hossein</span>
-    </div>
+    <div class="profile d-flex align-items-center dropdown-toggle"
+     id="profileDropdown"
+     data-bs-toggle="dropdown"
+     aria-expanded="false"
+     style="cursor:pointer;">
+
+    <img
+        src="{{ Auth::check() && Auth::user()->profile_photo ? asset(Auth::user()->profile_photo) : 'https://i.pravatar.cc/40' }}"
+        alt="Avatar"
+        class="rounded-circle me-2"
+        width="35"
+        height="35"
+        style="object-fit:cover;"
+        onerror="this.src='https://i.pravatar.cc/40';"
+    >
+
+    <span>{{ Auth::user()->name ?? 'Guest' }}</span>
+</div>
+
 
     <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="profileDropdown">
       <li>

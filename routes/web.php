@@ -13,10 +13,12 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CarServicingController;
 use App\Http\Controllers\DriverTaskController;
 use App\Http\Controllers\LeadController;
+use App\Http\Controllers\ForgotPasswordController;
+
+
 
 use Illuminate\Support\Facades\Mail;
 use App\Mail\TestEmail;
-
 
 Route::get('/car-share/{token}', [LeadController::class, 'publicShowcase']);
 Route::post('/car-share/{token}/confirm', [LeadController::class, 'confirmCar']);
@@ -43,7 +45,13 @@ require_once base_path('routes/bookings.php');
 require_once base_path('routes/leads.php');
 Route::get('/alert-test', [AlertController::class, 'index'])->name('alert.index');
 Route::post('/alert-add', [AlertController::class, 'store'])->name('alert.store');
+Route::get('/reset_password', [AuthController::class, 'reset_password'])->name('reset_password');
 
+
+Route::get('/reset-password', [ForgotPasswordController::class, 'reset_password'])->name('password.request');
+Route::post('/reset-password', [ForgotPasswordController::class, 'send_reset_link'])->name('password.email');
+Route::get('/reset-password/{token}', [ForgotPasswordController::class, 'show_reset_form'])->name('password.reset');
+Route::post('/reset-password/update', [ForgotPasswordController::class, 'update_password'])->name('password.update');
 
 
 
