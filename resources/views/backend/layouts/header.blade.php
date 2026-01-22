@@ -3,17 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>WedinWheels Dashboard (Bootstrap)</title>
-
-  <!-- Bootstrap 5 CSS -->
-  <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"> -->
+  <title>WedinWheels Dashboard </title>
   <link href="{{asset('backend/bootstrap.min.css')}}" rel="stylesheet">
   <!-- FontAwesome -->
   <script src="https://kit.fontawesome.com/a2e0a4b2d1.js" crossorigin="anonymous"></script>
- <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"> -->
   <link href="{{ asset('backend/css/bootstrap.min.css') }}" rel="stylesheet">
   <!-- Chart.js -->
-  <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> -->
     <script src="{{ asset('backend/js/chart.js') }}"></script>
 
   <style>
@@ -26,7 +21,7 @@
     /* Sidebar */
     .sidebar {
       background-color: #1c1c22; /* greyish dark tone */
-      height: 500vh;
+      height: 300vh;
       width: 240px;
       position: fixed;
       top: 0;

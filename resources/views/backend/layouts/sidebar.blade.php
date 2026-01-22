@@ -221,7 +221,7 @@
 <style>
     .sidebar {
         width: 260px;
-        height: 100vh;
+        height: ;
         background: #111827;
         padding: 18px 14px;
         overflow-y: auto;
