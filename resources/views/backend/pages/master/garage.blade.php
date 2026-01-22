@@ -4,9 +4,11 @@
 <section class="dashboard row g-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2 class="text-warning fw-bold">Garage Master</h2>
+                 @can('create garage')
         <button class="btn btn-warning text-dark fw-semibold" data-bs-toggle="modal" data-bs-target="#addGarageModaltoaddnew">
             + Add Garage
         </button>
+        @endcan
     </div>
 
     <div class="col-12">
@@ -41,6 +43,7 @@
             <div class="modal-header border-warning">
                 <h5 class="modal-title text-warning" id="addGarageModaltoaddnewLabel">Add New Garage</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+               
             </div>
             <form id="addGarageForm" method="post" action="{{ url('add_new_garage') }}">
                 @csrf
@@ -112,8 +115,12 @@ function fetchGarages(page = 1) {
                             <td>${g.manager}</td>
                             <td><span class="badge ${g.status == 1 ? 'bg-success' : 'bg-danger'}">${g.status == 1 ? 'Active' : 'Inactive'}</span></td>
                             <td>
+                                @can('edit garage')
                                 <button class="btn btn-sm btn-warning text-dark me-1" onclick="editGarage(${g.id})">Edit</button>
+                                @endcan
+                                @can('delete garage')
                                 <button class="btn btn-sm btn-danger text-white" onclick="deleteGarage(${g.id})">Delete</button>
+                                @endcan
                             </td>
                         </tr>
                     `);

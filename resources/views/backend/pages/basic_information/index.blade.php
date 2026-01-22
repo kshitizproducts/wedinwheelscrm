@@ -5,10 +5,11 @@
 
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h2 class="text-warning fw-bold">Basic Information</h2>
-
-            <button class="btn btn-warning text-dark fw-semibold" onclick="openAddModal()">
-                + Add Information
-            </button>
+            @can('create companyprofile')
+                <button class="btn btn-warning text-dark fw-semibold" onclick="openAddModal()">
+                    + Add Information
+                </button>
+            @endcan
         </div>
 
         <div class="col-12">
@@ -164,15 +165,21 @@
                         </td>
 
                         <td>
+
+                            @can('edit companyprofile')
                             <button class="btn btn-sm btn-warning text-dark"
                                 onclick="editBusiness(${b.id})">
                                 Edit
                             </button>
+                            @endcan
 
+
+                            @can('delete companyprofile')
                             <button class="btn btn-sm btn-danger"
                                 onclick="deleteBusiness(${b.id})">
                                 Delete
                             </button>
+                            @endcan
                         </td>
                     </tr>
                 `)

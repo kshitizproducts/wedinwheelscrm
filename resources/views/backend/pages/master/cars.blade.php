@@ -6,11 +6,13 @@
         <!-- Topbar -->
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h2 class="text-warning fw-bold">Car Master</h2>
+              @can('create cars')
             <button class="btn btn-warning text-dark fw-semibold" data-bs-toggle="modal" data-bs-target="#carModal">
                 + Add New Car
             </button>
+            @endcan
 
-        </div>
+        </div>   
 
         <!-- Car Table -->
         <div class="col-12">
@@ -64,17 +66,24 @@
                                                 class="badge bg-info text-dark">👀 Profile</span></a>
                                     </td>
                                     <td>
+
+                                        @can('edit cars')
                                         <a target="_blank" href="{{ url('update_car_profile/' . $car->unique_id) }}"><span
                                                 class="badge bg-warning text-dark">Complete Profile</span></a>
-                                    </td>
+                                                @endcan
+                                    </td> 
                                     <td>
                                         <!-- <button class="btn btn-sm btn-warning text-dark">Edit</button> -->
 
                                         <!-- Edit codes starts here -->
-                                        <button class="btn btn-warning text-dark fw-semibold" data-bs-toggle="modal"
+
+                                        @can('edit cars')
+                                        <button class="btn btn-warning text-dark fw-semibold" data-bs-toggle="modal" 
                                             data-bs-target="#carModalforedit{{ $car->id }}">
                                             Edit
                                         </button>
+
+                                        @endcan
                                         <div class="modal fade" id="carModalforedit{{ $car->id }}" tabindex="-1"
                                             aria-labelledby="carModalforedit{{ $car->id }}Label" aria-hidden="true">
                                             <div class="modal-dialog modal-dialog-centered">
@@ -185,13 +194,15 @@
                                         <!-- <button class="btn btn-sm btn-danger">Delete</button> -->
 
                                         <!-- delete function starts here -->
+
+                                        @can('delete cars')
                                         <form id="deletenewcarform" method="post" action="{{ url('delete_new_cars') }}">
                                             @csrf
                                             <input type="hidden" name="unique_id" value="{{ $car->unique_id }}">
                                             <button type="button" class="btn btn-danger fw-semibold"
                                                 onclick="delete_car_function()">Delete</button>
                                         </form>
-
+                                        @endcan
                                         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
                                         <script>
                                             function delete_car_function() {

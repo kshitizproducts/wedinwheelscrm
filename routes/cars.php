@@ -3,7 +3,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CarsMasterController;
 
- 
+   
 
 Route::get('/car_profile/{id}', [CarsMasterController::class, 'car_profile'])->name('car_profile');
 Route::middleware(['custom_auth', 'role:Admin'])->group(function () {
@@ -16,7 +16,7 @@ Route::middleware(['custom_auth', 'role:Admin'])->group(function () {
 // Route::get('/car_status', function () {
 //     return view('backend.pages.car_status.index');
 // });     
-
+Route::get('/update_car_profile/{id}', [CarsMasterController::class, 'update_car_profile'])->name('update_car_profile');
 Route::get('/cars_master', [CarsMasterController::class, 'cars_master'])->name('cars_master');
 Route::get('/car_status', [CarsMasterController::class, 'car_status'])->name('car_status');
 Route::post('/add_new_cars', [CarsMasterController::class, 'add_new_cars'])->name('add_new_cars');

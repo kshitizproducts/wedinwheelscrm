@@ -26,7 +26,7 @@
     /* Sidebar */
     .sidebar {
       background-color: #1c1c22; /* greyish dark tone */
-      height: 100vh;
+      height: 500vh;
       width: 240px;
       position: fixed;
       top: 0;

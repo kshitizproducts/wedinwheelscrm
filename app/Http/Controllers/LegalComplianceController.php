@@ -2,17 +2,38 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use Illuminate\Http\Request; 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class LegalComplianceController extends Controller
+class LegalComplianceController extends Controller  implements HasMiddleware
+
 {
+      public static function middleware(): array
+    {
+        return static::middlewares();
+    }
+    public static function middlewares(): array
+    {
+        return [
+            new Middleware(middleware: 'auth'), 
+
+            new Middleware(middleware: 'permission:view legal', only: ['index']),
+
+            new Middleware(middleware: 'permission:create legal', only: ['create', 'store']),
+
+            new Middleware(middleware: 'permission:edit legal', only: ['edit', 'update']),
+
+            new Middleware(middleware: 'permission:delete legal', only: ['delete']),
+        ];    
+    }
     public function index()
     {
         return view('backend.pages.legal.index');
     }
 
-    public function get()
+    public function get()  
     {
         $data = DB::table('legal_documents')->orderBy('id', 'desc')->get();
 
@@ -20,7 +41,7 @@ class LegalComplianceController extends Controller
             'success' => true,
             'data' => $data
         ]);
-    }
+    } 
 
     public function save(Request $r)
     {

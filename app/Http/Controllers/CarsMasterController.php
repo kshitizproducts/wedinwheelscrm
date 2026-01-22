@@ -186,9 +186,19 @@ public function car_status()
         $car_service = DB::table('car_service')->where('car_id', $id)->get();
         return view('backend/pages/cars/profile', compact('car_data', 'car_documents', 'car_service'));
     }
+      public function update_car_profile($id)
+{
+    $car_data = DB::table('cars')->where('unique_id', $id)->first();
+    $car_documents = DB::table('car_documents')->where('car_id', $id)->get();
+    $car_service_data = DB::table('car_service')->where('car_id', $id)->get();
+    $service_master = DB::table('service_master')->get();
+    $garage_master = DB::table('garage_master')->get();
+
+    return view('backend.pages.cars.edit_profile', compact('id','car_data', 'car_documents', 'car_service_data','service_master','garage_master'));
+}
 
    
-   
+    
   
     public function updateProfilePart1(Request $request)
     {

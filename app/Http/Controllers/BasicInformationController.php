@@ -14,7 +14,7 @@ class BasicInformationController extends Controller implements HasMiddleware
     public static function middlewares(): array
     {
         return [
-            new Middleware(middleware: 'auth'),
+            new Middleware(middleware: 'auth'), 
 
             new Middleware(middleware: 'permission:view companyprofile', only: ['index']),
 
@@ -25,7 +25,7 @@ class BasicInformationController extends Controller implements HasMiddleware
             new Middleware(middleware: 'permission:delete companyprofile', only: ['delete']),
         ];    
     }
-
+    
     public function index()
     {
         return view('backend.pages/basic_information.index');
