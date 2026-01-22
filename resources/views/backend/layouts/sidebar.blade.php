@@ -219,14 +219,19 @@
     </nav>
 </aside>
 <style>
-    .sidebar {
-        width: 260px;
-        height: ;
-        background: #111827;
-        padding: 18px 14px;
-        overflow-y: auto;
-        color: #fff;
-    }
+ .sidebar {
+    width: 260px;
+    height: 100vh;              /* ✅ full screen height */
+    background: #111827;
+    padding: 18px 14px;
+    overflow-y: auto;           /* ✅ scroll when content is long */
+    color: #fff;
+
+    position: fixed;            /* ✅ sidebar screen ke andar fix rahe */
+    top: 0;                     /* ✅ start from top */
+    left: 0;                    /* ✅ left side */
+}
+
 
     .sidebar-menu .menu-link {
         display: flex;
