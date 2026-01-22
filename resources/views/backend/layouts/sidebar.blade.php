@@ -317,73 +317,9 @@
 
     /* new here */
 
-/* ✅ Force mobile sidebar hidden by default */
-@media (max-width: 992px) {
-  .sidebar {
-    transform: translateX(-100%);
-    left: 0 !important;
-  }
-  .sidebar.show {
-    transform: translateX(0);
-  }
-}
-.sidebar-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.6);
-  z-index: 1040;
-  opacity: 0;
-  visibility: hidden;
-  transition: 0.3s;
-}
-
-.sidebar-backdrop.show {
-  opacity: 1;
-  visibility: visible;
-}
 
     /* end of new here */
 </style>
-
-
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
-
-    const menuBtn = document.getElementById("menu-btn");
-    const sidebar = document.getElementById("sidebar");
-    const backdrop = document.getElementById("sidebarBackdrop");
-
-    function openSidebar(){
-      sidebar.classList.add("show");
-      backdrop.classList.add("show");
-      document.body.style.overflow = "hidden"; // ✅ no scroll background
-    }
-
-    function closeSidebar(){
-      sidebar.classList.remove("show");
-      backdrop.classList.remove("show");
-      document.body.style.overflow = "";
-    }
-
-    // Toggle
-    menuBtn?.addEventListener("click", function () {
-      if (sidebar.classList.contains("show")) closeSidebar();
-      else openSidebar();
-    });
-
-    // Backdrop click
-    backdrop?.addEventListener("click", closeSidebar);
-
-    // Auto close on resize
-    window.addEventListener("resize", function(){
-      if(window.innerWidth > 992){
-        closeSidebar();
-      }
-    });
-
-  });
-</script>
-{{-- end ofnew --}}
 <script>
     document.querySelectorAll(".accordion-title").forEach((title) => {
         title.addEventListener("click", () => {
