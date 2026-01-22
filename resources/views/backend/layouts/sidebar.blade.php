@@ -227,9 +227,7 @@
     overflow-y: auto;           /* ✅ scroll when content is long */
     color: #fff;
 
-    position: fixed;            /* ✅ sidebar screen ke andar fix rahe */
-    top: 0;                     /* ✅ start from top */
-    left: 0;                    /* ✅ left side */
+               /* ✅ left side */
 }
 
 
