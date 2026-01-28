@@ -105,6 +105,8 @@
                 </h4>
 
                 <ul class="submenu">
+                    <li><a href="{{ url('company_profile') }}"><i class="fa-solid fa-circle-info me-2"></i> Company Profile</a></li>
+                    
                     <li><a href="{{ url('basic-information') }}"><i class="fa-solid fa-circle-info me-2"></i> Basic Information</a></li>
                     <li><a href="{{ url('legal-compliance') }}"><i class="fa-solid fa-scale-balanced me-2"></i> Legal & Compliance</a></li>
                     <li><a href="{{ url('address_contacts') }}"><i class="fa-solid fa-location-dot me-2"></i> Address & Contacts</a></li>

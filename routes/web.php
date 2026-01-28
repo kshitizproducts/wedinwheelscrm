@@ -13,8 +13,8 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CarServicingController;
 use App\Http\Controllers\DriverTaskController;
 use App\Http\Controllers\LeadController;
+use App\Http\Controllers\CompanyprofileController;
 use App\Http\Controllers\ForgotPasswordController;
-
 
 
 use Illuminate\Support\Facades\Mail;
@@ -150,8 +150,8 @@ Route::middleware(['custom_auth', 'role:Admin'])->group(function () {
 
   
  
-
  
+  
     // Basic Information Routes
 
     Route::get('/basic-information', [BasicInformationController::class, 'index'])->name('basic_information_index');
@@ -287,7 +287,19 @@ Route::middleware(['custom_auth', 'role:Admin'])->group(function () {
 
     Route::post('change-password/update', [ProfileController::class, 'updatePassword']);
 
+// company profile
 
+    Route::get('/company_profile', [CompanyprofileController::class, 'index'])->name('company_profile');
+    Route::get('/legal-documents', [CompanyprofileController::class, 'index']);
+Route::post('/legal-documents/update', [CompanyprofileController::class, 'update']);
+
+
+
+Route::get('/company-profile/legal', [CompanyprofileController::class, 'legalCompliance']);
+Route::post('/company-profile/legal/update', [CompanyprofileController::class, 'updateLegalCompliance']);
+Route::post('/company-profile/legal/update', [CompanyprofileController::class, 'updateLegalCompliance'])->name('legal_update');
+Route::post('/company-profile/banking/update', [CompanyprofileController::class, 'updateBanking'])->name('banking_update');
+Route::post('/company-profile/basic/update', [CompanyprofileController::class, 'updateBasicInfo'])->name('basic_update');
 
 
 });
