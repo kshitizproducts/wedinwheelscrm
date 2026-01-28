@@ -23,6 +23,38 @@
                 <i class="fa-solid fa-gauge me-2"></i> Dashboard
             </a>
 
+
+            
+
+            <!-- Company Profile -->
+            @can('view companyprofile')
+                <h4 class="accordion-title">
+                    <span>
+                        <i class="fa-solid fa-building me-2"></i> Company Profile
+                    </span>
+                    <i class="fa fa-chevron-down accordion-icon"></i>
+                </h4>
+
+                <ul class="submenu">
+                    <li><a href="{{ url('company_profile') }}"><i class="fa-solid fa-circle-info me-2"></i> Company Profile</a></li>
+                   
+                </ul>
+            @endcan
+   <!-- HR Manager -->
+            @can('view HrManager')
+                <h4 class="accordion-title">
+                    <span>
+                        <i class="fa-solid fa-people-group me-2"></i> HR Manager
+                    </span>
+                    <i class="fa fa-chevron-down accordion-icon"></i>
+                </h4>
+
+                <ul class="submenu">
+                    <li><a href="{{ url('users') }}"><i class="fa-solid fa-users me-2"></i> Users</a></li>
+                    <li><a href="{{ url('employee_docs') }}"><i class="fa-solid fa-id-card me-2"></i> Employee Documents</a></li>
+                </ul>
+            @endcan
+
             <!-- MASTER -->
             <h4 class="accordion-title">
                 <span>
@@ -90,45 +122,11 @@
                         <a href="{{ url('lead_generation') }}">
                             <i class="fa-solid fa-plus me-2"></i> Lead Generation
                         </a>
-                    </li>
+                    </li>  
                 @endcan
             </ul>
 
-
-            <!-- Company Profile -->
-            @can('view companyprofile')
-                <h4 class="accordion-title">
-                    <span>
-                        <i class="fa-solid fa-building me-2"></i> Company Profile
-                    </span>
-                    <i class="fa fa-chevron-down accordion-icon"></i>
-                </h4>
-
-                <ul class="submenu">
-                    <li><a href="{{ url('company_profile') }}"><i class="fa-solid fa-circle-info me-2"></i> Company Profile</a></li>
-                    
-                    <li><a href="{{ url('basic-information') }}"><i class="fa-solid fa-circle-info me-2"></i> Basic Information</a></li>
-                    <li><a href="{{ url('legal-compliance') }}"><i class="fa-solid fa-scale-balanced me-2"></i> Legal & Compliance</a></li>
-                    <li><a href="{{ url('address_contacts') }}"><i class="fa-solid fa-location-dot me-2"></i> Address & Contacts</a></li>
-                    <li><a href="{{ url('financial_banking') }}"><i class="fa-solid fa-building-columns me-2"></i> Financial & Banking</a></li>
-                </ul>
-            @endcan
-
-
-            <!-- HR Manager -->
-            @can('view HrManager')
-                <h4 class="accordion-title">
-                    <span>
-                        <i class="fa-solid fa-people-group me-2"></i> HR Manager
-                    </span>
-                    <i class="fa fa-chevron-down accordion-icon"></i>
-                </h4>
-
-                <ul class="submenu">
-                    <li><a href="{{ url('users') }}"><i class="fa-solid fa-users me-2"></i> Users</a></li>
-                    <li><a href="{{ url('employee_docs') }}"><i class="fa-solid fa-id-card me-2"></i> Employee Documents</a></li>
-                </ul>
-            @endcan
+         
 
 
             <!-- Maintainance -->

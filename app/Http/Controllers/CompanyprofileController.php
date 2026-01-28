@@ -10,8 +10,8 @@ class CompanyprofileController extends Controller
 {
     public function index()
     {
-        // Ab saara data ek hi table 'legal_documents' se aayega
-        $doc = DB::table('legal_documents')->where('id', 1)->first();
+        // Ab saara data ek hi table 'company_profile' se aayega
+        $doc = DB::table('company_profile')->where('id', 1)->first();
 
         if (!$doc) {
             $doc = (object)[]; 
@@ -41,7 +41,7 @@ class CompanyprofileController extends Controller
             $data['profile_picture'] = $this->uploadDoc($request->file('profile_picture'), 'profile');
         }
 
-        DB::table('legal_documents')->where('id', 1)->update($data);
+        DB::table('company_profile')->where('id', 1)->update($data);
         return back()->with('success_basic', 'Basic profile updated successfully!');
     }
 
@@ -63,7 +63,7 @@ class CompanyprofileController extends Controller
             }
         }
 
-        DB::table('legal_documents')->where('id', 1)->update($updateData);
+        DB::table('company_profile')->where('id', 1)->update($updateData);
         return back()->with('success_legal', 'Legal documents updated!');
     }
 
@@ -71,7 +71,7 @@ class CompanyprofileController extends Controller
     public function updateBanking(Request $request)
     {
         // dd($request->all());
-        DB::table('legal_documents')->where('id', 1)->update([
+        DB::table('company_profile')->where('id', 1)->update([
             'acc_holder' => $request->acc_holder,
             'acc_number' => $request->acc_number,
             'ifsc'       => $request->ifsc,
@@ -80,4 +80,19 @@ class CompanyprofileController extends Controller
 
         return back()->with('success_bank', 'Banking information updated!');
     }
+
+
+
+      public function get()
+    {
+        $data = DB::table('business_profiles')->orderBy('id', 'desc')->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $data
+        ]);
+    }
+
+
+    
 }

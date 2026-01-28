@@ -49,7 +49,7 @@ require_once base_path('routes/leads.php');
 Route::get('/alert-test', [AlertController::class, 'index'])->name('alert.index');
 Route::post('/alert-add', [AlertController::class, 'store'])->name('alert.store');
 Route::get('/reset_password', [AuthController::class, 'reset_password'])->name('reset_password');
-  
+
 
 Route::get('/reset-password', [ForgotPasswordController::class, 'reset_password'])->name('password.request');
 Route::post('/reset-password', [ForgotPasswordController::class, 'send_reset_link'])->name('password.email');
@@ -148,70 +148,11 @@ Route::middleware(['custom_auth', 'role:Admin'])->group(function () {
     Route::post('/delete_booking', [BookingController::class, 'delete_booking']);
 
 
-  
- 
- 
-  
-    // Basic Information Routes
-
-    Route::get('/basic-information', [BasicInformationController::class, 'index'])->name('basic_information_index');
-    Route::get('/basic-information/get', [BasicInformationController::class, 'get'])->name('basic_information_get');
-    Route::post('/basic_information_save', [BasicInformationController::class, 'basic_information_save'])->name('basic_information_save');
-    Route::get('/basic-information/edit/{id}', [BasicInformationController::class, 'edit'])->name('basic_information_edit');
-    Route::delete('/basic-information/delete/{id}', [BasicInformationController::class, 'delete'])->name('basic_information_delete');
-
-
- 
-
-
-    // legal 
-
-
-    Route::get('/legal-compliance', [LegalComplianceController::class, 'index'])->name('legal_index');
-
-    Route::get('/legal-compliance/get', [LegalComplianceController::class, 'get'])->name('legal_get');
-
-    Route::post('/legal-compliance/save', [LegalComplianceController::class, 'save'])->name('legal_save');
-
-    Route::get('/legal-compliance/edit/{id}', [LegalComplianceController::class, 'edit'])->name('legal_edit');
-
-    Route::delete('/legal-compliance/delete/{id}', [LegalComplianceController::class, 'delete'])->name('legal_delete');
 
 
 
 
 
-    // address
-
-    Route::get('/address_contacts', [AddressContactsController::class, 'index'])->name('address_contacts_index');
-
-    Route::get('/address_contacts/get', [AddressContactsController::class, 'get'])->name('address_contacts_get');
-
-    Route::post('/address_contacts/save', [AddressContactsController::class, 'save'])->name('address_contacts_save');
-
-    Route::get('/address_contacts/edit/{id}', [AddressContactsController::class, 'edit'])->name('address_contacts_edit');
-
-    Route::delete('/address_contacts/delete/{id}', [AddressContactsController::class, 'delete'])->name('address_contacts_delete');
-
-
-
-
-
-
-    // financial
-
-    // Route::get('/financial_banking', [FinancialBankingController::class, 'index'])->name('financial_banking_index');
-// Route::get('/financial_banking/get', [FinancialBankingController::class, 'get'])->name('financial_banking_get');
-// Route::post('/financial_banking/save', [FinancialBankingController::class, 'save'])->name('financial_banking_save');
-// Route::get('/financial_banking/edit/{id}', [FinancialBankingController::class, 'edit'])->name('financial_banking_edit');
-// Route::delete('/financial_banking/delete/{id}', [FinancialBankingController::class, 'delete'])->name('financial_banking_delete');
-
-    Route::get('/financial_banking', [FinancialBankingController::class, 'index']);
-    Route::get('/financial_banking/get', [FinancialBankingController::class, 'get'])->name('financial_banking_get');
-    Route::post('/financial_banking/save', [FinancialBankingController::class, 'save'])->name('financial_banking_save');
-
-    Route::get('/financial_banking/edit/{id}', [FinancialBankingController::class, 'edit']);
-    Route::delete('/financial_banking/delete/{id}', [FinancialBankingController::class, 'delete']);
 
 
 
@@ -267,8 +208,8 @@ Route::middleware(['custom_auth', 'role:Admin'])->group(function () {
 
 
 
-
-
+Route::get('employee-docs/print/{id}', [EmployeeDocumentationController::class, 'print_dossier']);
+  
 
     // Car servicing 
     Route::get('/car_servicing', [CarServicingController::class, 'car_servicing'])->name('car_servicing');
@@ -287,19 +228,20 @@ Route::middleware(['custom_auth', 'role:Admin'])->group(function () {
 
     Route::post('change-password/update', [ProfileController::class, 'updatePassword']);
 
-// company profile
+    // company profile
 
     Route::get('/company_profile', [CompanyprofileController::class, 'index'])->name('company_profile');
     Route::get('/legal-documents', [CompanyprofileController::class, 'index']);
-Route::post('/legal-documents/update', [CompanyprofileController::class, 'update']);
+    Route::post('/legal-documents/update', [CompanyprofileController::class, 'update']);
 
 
 
-Route::get('/company-profile/legal', [CompanyprofileController::class, 'legalCompliance']);
-Route::post('/company-profile/legal/update', [CompanyprofileController::class, 'updateLegalCompliance']);
-Route::post('/company-profile/legal/update', [CompanyprofileController::class, 'updateLegalCompliance'])->name('legal_update');
-Route::post('/company-profile/banking/update', [CompanyprofileController::class, 'updateBanking'])->name('banking_update');
-Route::post('/company-profile/basic/update', [CompanyprofileController::class, 'updateBasicInfo'])->name('basic_update');
+    Route::get('/company-profile/legal', [CompanyprofileController::class, 'legalCompliance']);
+    Route::post('/company-profile/legal/update', [CompanyprofileController::class, 'updateLegalCompliance']);
+    Route::post('/company-profile/legal/update', [CompanyprofileController::class, 'updateLegalCompliance'])->name('legal_update');
+    Route::post('/company-profile/banking/update', [CompanyprofileController::class, 'updateBanking'])->name('banking_update');
+    Route::post('/company-profile/basic/update', [CompanyprofileController::class, 'updateBasicInfo'])->name('basic_update');
+    Route::get('/basic-information/get', [CompanyprofileController::class, 'get'])->name('basic_information_get');
 
 
 });

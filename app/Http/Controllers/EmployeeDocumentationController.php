@@ -8,7 +8,7 @@ use Illuminate\Support\Str;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-class EmployeeDocumentationController extends Controller
+class EmployeeDocumentationController extends Controller   
 {
     //
 
@@ -28,6 +28,22 @@ class EmployeeDocumentationController extends Controller
         return view('backend.pages.master.employee_docs',compact('user_docs'));
     } 
     
+
+    // Naya function Dossier View ke liye
+    public function print_dossier($id)
+    {
+        $item = DB::table('user_documents')
+            ->join('users', 'users.id', '=', 'user_documents.user_id')
+            ->select('user_documents.*', 'users.name', 'users.email')
+            ->where('user_documents.id', $id)
+            ->first();
+
+        if (!$item) {
+            return back()->with('error', 'Record not found');
+        }
+
+        return view('backend.pages.master.print_dossier', compact('item'));
+    }
 
       public function getEmployees(Request $request)
     {
