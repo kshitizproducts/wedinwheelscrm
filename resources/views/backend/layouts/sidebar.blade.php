@@ -16,15 +16,35 @@
 
     <nav class="sidebar-menu">
 
-        @canany(['view drivertask', 'view garage', 'view role', 'view inquiries', 'view lead', 'view driverschedule', 'view user', 'view cars','view companyprofile','view HrManager'])
-
+         @can('view master')
             <!-- Dashboard -->
             <a href="{{ url('dashboard') }}" class="menu-link active">
                 <i class="fa-solid fa-gauge me-2"></i> Dashboard
             </a>
+            @endcan
 
 
-            
+            @can('view stocks')
+             <a href="{{ url('inventory_dashboard') }}" class="menu-link active">
+                <i class="fa-solid fa-gauge me-2"></i> Dashboard
+            </a>
+            @endcan
+
+              <!-- Stock -->
+               @can('view stocks')
+                <h4 class="accordion-title">
+                    <span>
+                        <i class="fa-solid fa-building me-2"></i> Stock Management
+                    </span>
+                    <i class="fa fa-chevron-down accordion-icon"></i>
+                </h4>
+
+                <ul class="submenu">
+                    <li><a href="{{ url('stock') }}"><i class="fa-solid fa-circle-info me-2"></i> My Stocks</a></li>
+                   
+                </ul>
+                @endcan
+
 
             <!-- Company Profile -->
             @can('view companyprofile')
@@ -56,6 +76,8 @@
             @endcan
 
             <!-- MASTER -->
+
+             @can('view master')
             <h4 class="accordion-title">
                 <span>
                     <i class="fa-solid fa-database me-2"></i> Master
@@ -106,8 +128,10 @@
                     </li>
                 @endcan
             </ul>
+            @endcan
 
-
+            
+             @can('view master')
             <!-- Lead Generation -->
             <h4 class="accordion-title">
                 <span>
@@ -125,10 +149,10 @@
                     </li>  
                 @endcan
             </ul>
-
+            @endcan
          
 
-
+            
             <!-- Maintainance -->
             @can('view HrManager')
                 <h4 class="accordion-title">
@@ -144,6 +168,9 @@
             @endcan
 
 
+
+
+             @can('view master')
             <!-- My Tasks -->
             <h4 class="accordion-title">
                 <span>
@@ -165,8 +192,11 @@
                     <li><a href="{{ url('driver_schedule') }}"><i class="fa-solid fa-calendar-check me-2"></i> Driver Schedules</a></li>
                 @endcan
             </ul>
+            @endcan
 
 
+
+             @can('view master')
             <!-- Website Enquiries -->
             <h4 class="accordion-title">
                 <span>
@@ -180,7 +210,11 @@
                     <li><a href="{{ url('customer_enquiries') }}"><i class="fa-solid fa-address-book me-2"></i> Customer Enquiries</a></li>
                 @endcan
             </ul>
+            @endcan
 
+
+
+             @can('view master')
 
             <!-- Calendar & Schedule -->
             <h4 class="accordion-title">
@@ -196,7 +230,11 @@
                 @endcan
             </ul>
 
+            @endcan
 
+
+
+             @can('view master')
             <!-- Settings -->
             <h4 class="accordion-title">
                 <span>
@@ -209,13 +247,12 @@
                 <li><a href="{{ url('roles') }}"><i class="fa-solid fa-user-shield me-2"></i> Roles</a></li>
                 <li><a href="{{ url('permission') }}"><i class="fa-solid fa-lock me-2"></i> Permissions</a></li>
             </ul>
-
+            @endcan
             <!-- Logout -->
             <a href="{{ url('logout') }}" class="menu-link logout">
                 <i class="fa-solid fa-right-from-bracket me-2"></i> Logout
             </a>
 
-        @endcanany
     </nav>
 </aside>
 <style>

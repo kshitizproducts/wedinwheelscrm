@@ -1,0 +1,195 @@
+<?php
+namespace App\Http\Controllers;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;  
+use File;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+    use Illuminate\Support\Facades\Auth;
+class StockController extends Controller implements HasMiddleware
+{
+
+public static function middleware(): array
+    {
+        return static::middlewares();
+    }public static function middlewares(): array
+{
+    return [
+        new Middleware(middleware: 'auth'),
+
+        // 'stocks' ki jagah 'permission' likhein kyunki app.php mein wahi alias hai
+        new Middleware(middleware: 'permission:view stocks', only: ['index']),
+
+        new Middleware(middleware: 'permission:create stocks', only: ['create', 'store']),
+
+        new Middleware(middleware: 'permission:edit stocks', only: ['edit', 'update']),
+
+        new Middleware(middleware: 'permission:delete stocks', only: ['delete']),
+    ];    
+}
+ public function index()
+{
+    // Joins use karne se page load speed 10x fast ho jayegi
+    $stocks = DB::table('stocks')
+        ->leftJoin('company_list', 'stocks.company', '=', 'company_list.id')
+        ->leftJoin('product_category_master', 'stocks.product_category', '=', 'product_category_master.id')
+        ->select('stocks.*', 'company_list.company_name', 'product_category_master.name as category_name')
+        ->orderBy('stocks.id', 'desc')
+        ->get();
+
+    $company_list = DB::table('company_list')->get();
+    $category_master = DB::table('product_category_master')->get();
+
+    // dd($stocks);
+
+    return view('backend.pages.stock.index', compact('stocks', 'company_list', 'category_master'));
+}
+    public function store(Request $request)
+    {
+        return $this->saveStock($request);
+    }
+
+
+ public function saveStock(Request $request, $id = null)
+{
+    // 1. Validation
+    $rules = [
+        'product_name' => 'required|string|max:255',
+        'company_id' => 'required',
+        'category_id' => 'required',
+        'receipt_no' => 'required',
+        'seller_name' => 'required',
+        'seller_contact' => 'required',
+        'payer_name' => 'required',
+        'payer_contact' => 'required',
+        'receiver_name' => 'required',
+        'receiver_contact' => 'required',
+        'mrp' => 'required|numeric',
+        'purchase_price' => 'required|numeric',
+        'product_img.*' => 'image|mimes:jpeg,png,jpg,webp|max:2048',
+        'product_video' => 'nullable|mimes:mp4,mov,ogg,qt|max:20480',
+        'warranty_card' => 'nullable|mimes:jpeg,png,pdf|max:2048',
+        'invoice_file.*' => 'nullable|mimes:pdf,jpeg,png,jpg|max:2048',
+    ];
+
+    $validator = Validator::make($request->all(), $rules);
+
+    if ($validator->fails()) {
+        return response()->json([
+            'success' => false,
+            'errors' => $validator->errors(),
+            'message' => 'Please fix the errors below.'
+        ], 422);
+    }
+
+    // 2. Prepare Data (Database columns ke mutabik)
+    $insertData = [
+        'receipt_no'          => $request->receipt_no,
+        'product_name'        => $request->product_name,
+        'product_category'    => $request->category_id, // Table column: product_category
+        'company'             => $request->company_id,  // Table column: company
+        'condition_type'      => $request->condition_type,
+        'warranty_start_date' => $request->warranty_start_date,
+        'warranty_years'      => $request->warranty_years ?? 0,
+        'warranty_end_date'   => $request->warranty_end_date,
+        'mrp'                 => $request->mrp,
+        'purchase_price'      => $request->purchase_price,
+        'seller_name'         => $request->seller_name,
+        'seller_contact'      => $request->seller_contact,
+        'payer_name'          => $request->payer_name,
+        'payer_contact'       => $request->payer_contact,
+        'receiver_name'       => $request->receiver_name,
+        'receiver_contact'    => $request->receiver_contact,
+        'updated_at'          => now()
+    ];
+
+    // 3. File Upload Logic
+    $fileFields = ['product_img', 'product_video', 'warranty_card', 'invoice_file'];
+    foreach ($fileFields as $field) {
+        if ($request->hasFile($field)) {
+            $fileInput = $request->file($field);
+            if (is_array($fileInput)) {
+                $paths = [];
+                foreach ($fileInput as $file) {
+                    $name = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                    $file->move(public_path('uploads/stock'), $name);
+                    $paths[] = $name;
+                }
+                $insertData[$field] = implode(',', $paths);
+            } else {
+                $name = time() . '_' . uniqid() . '.' . $fileInput->getClientOriginalExtension();
+                $fileInput->move(public_path('uploads/stock'), $name);
+                $insertData[$field] = $name;
+            }
+        }
+    }
+
+    // 4. Finalize
+    try {
+        if ($id) {
+            DB::table('stocks')->where('id', $id)->update($insertData);
+            return response()->json(['success' => true, 'message' => 'Stock Updated Successfully!']);
+        } else {
+            $insertData['unique_id'] = 'STK-' . strtoupper(Str::random(8));
+            $insertData['created_at'] = now();
+            DB::table('stocks')->insert($insertData);
+            return response()->json(['success' => true, 'message' => 'Stock Added Successfully!']);
+        }
+    } catch (\Exception $e) {
+        return response()->json(['success' => false, 'message' => 'Database Error: ' . $e->getMessage()], 500);
+    }
+}
+
+    // Update Stock Method
+// Update Route logic
+    public function updateStock(Request $request)
+    {
+        return $this->saveStock($request, $request->id);
+    }
+
+    // Delete Route logic
+    public function deleteStock(Request $request)
+    {
+        $id = $request->id;
+        $stock = DB::table('stocks')->where('id', $id)->first();
+
+        if ($stock) {
+            // Clear files from folder
+            $filesCols = ['product_img', 'product_video', 'warranty_card', 'invoice_file'];
+            foreach ($filesCols as $col) {
+                if ($stock->$col && $stock->$col != 'NA') {
+                    $files = explode(',', $stock->$col);
+                    foreach ($files as $file) {
+                        if (File::exists(public_path('uploads/stock/' . $file))) {
+                            File::delete(public_path('uploads/stock/' . $file));
+                        }
+                    }
+                }
+            }
+            DB::table('stocks')->where('id', $id)->delete();
+            return response()->json(['success' => true]);
+        }
+        return response()->json(['success' => false], 404);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+}

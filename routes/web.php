@@ -1,4 +1,5 @@
 <?php
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AlertController;
@@ -15,10 +16,18 @@ use App\Http\Controllers\DriverTaskController;
 use App\Http\Controllers\LeadController;
 use App\Http\Controllers\CompanyprofileController;
 use App\Http\Controllers\ForgotPasswordController;
+use App\Http\Controllers\StockController;
 
 
 use Illuminate\Support\Facades\Mail;
 use App\Mail\TestEmail;
+
+
+ // stock routs
+Route::get('/stock', [StockController::class, 'index']);
+Route::post('/store-stock', [StockController::class, 'store']);
+Route::post('/update-stock', [StockController::class, 'update']);
+Route::post('/delete-stock', [StockController::class, 'delete']);
 
 
 
@@ -76,8 +85,7 @@ Route::get('/', function () {
 });
 
 
-
-
+Route::get('/inventory_dashboard', [DashboardController::class, 'inventory_dashboard'])->name('inventory_dashboard');
 
 
 // Public routes
@@ -242,6 +250,7 @@ Route::get('employee-docs/print/{id}', [EmployeeDocumentationController::class, 
     Route::post('/company-profile/banking/update', [CompanyprofileController::class, 'updateBanking'])->name('banking_update');
     Route::post('/company-profile/basic/update', [CompanyprofileController::class, 'updateBasicInfo'])->name('basic_update');
     Route::get('/basic-information/get', [CompanyprofileController::class, 'get'])->name('basic_information_get');
+
 
 
 });
