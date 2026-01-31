@@ -4,7 +4,7 @@
 
 <section class="dashboard container-fluid py-4">
     <h2 class="text-warning fw-bold mb-4">Admin Dashboard Overview</h2>
-
+ 
     {{-- ====== Stats Cards Row ====== --}}
     <div class="row g-3 mb-4">
         @php
@@ -21,7 +21,7 @@
         @endphp
 
         @foreach($stats as $stat)
-            <div class="col-xl-3 col-md-6">
+            <div class="col-12 col-md-6 col-xl-3">
                 <div class="card border-0 shadow-sm text-white p-3 mb-2" style="background: {{ $stat['bg'] }}; border-radius: 12px;">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>

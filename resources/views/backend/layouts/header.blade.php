@@ -10,7 +10,7 @@
   <link href="{{ asset('backend/css/bootstrap.min.css') }}" rel="stylesheet">
   <!-- Chart.js -->
     <script src="{{ asset('backend/js/chart.js') }}"></script>
-
+ 
   <style>
     body {
       background-color: #0e0e12;
@@ -19,18 +19,19 @@
     }
 
     /* Sidebar */
-    .sidebar {
-      background-color: #1c1c22; /* greyish dark tone */
-      height: 300vh;
-      width: 240px;
-      position: fixed;
-      top: 0;
-      left: 0;
-      padding: 1rem;
-      overflow-y: auto;
-      z-index: 1000;
-      box-shadow: 2px 0 10px rgba(0,0,0,0.4);
-    }
+   .sidebar {
+  background-color: #1c1c22;
+  height: 100vh; /* 300vh ko 100vh karein taaki scroll sidebar ke andar ho */
+  width: 240px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  padding: 1rem;
+  overflow-y: auto;
+  z-index: 1050; /* Z-index badhayein taaki topbar ke upar dikhe */
+  box-shadow: 2px 0 10px rgba(0,0,0,0.4);
+  transition: all 0.3s ease; /* Smooth transition */
+}
 
     .sidebar a {
       color: #cfcfcf;
@@ -74,29 +75,30 @@
     }
 
     /* Main content */
-    .main-content {
-      margin-left: 240px;
-      padding: 20px;
-    }
+   .main-content {
+  margin-left: 240px;
+  padding: 20px;
+  width: calc(100% - 240px); /* Screen ke hisaab se width calculate karega */
+}
 
-    .topbar {
-      background-color: #1f1f26;
-      padding: 10px 20px;
-      border-radius: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+  .topbar {
+  background: rgba(40, 40, 40, 0.9);
+  padding: 10px 15px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap; /* Elements ko niche girne se rokega */
+  width: 100%;
+}
 
-    .topbar input {
-      background: #2b2b2f;
-      border: none;
-      color: #fff;
-      border-radius: 8px;
-      padding: 8px 12px;
-      width: 100%;
-      max-width: 300px;
-    }
+   .topbar input {
+  max-width: 150px; /* Mobile par search chota rakhein */
+}
+@media (min-width: 992px) {
+  .topbar input {
+    max-width: 300px;
+  } 
+}
 
     /* Dashboard cards */
     .dashboard .card {
@@ -158,17 +160,25 @@
     }
 
     /* Sidebar toggle responsive */
-    @media (max-width: 992px) {
-      .sidebar {
-        left: -240px;
-        transition: left 0.3s ease;
-      }
-      .sidebar.show {
-        left: 0;
-      }
-      .main-content {
-        margin-left: 0;
-      }
+ /* Mobile Responsive Fix */
+@media (max-width: 992px) {
+  .sidebar {
+    left: -240px; /* Mobile par screen se bahar */
+  }
+  .sidebar.show {
+    left: 0; /* Menu click par andar aayega */
+  }
+  .main-content {
+    margin-left: 0;
+    width: 100%; /* Poori screen width lega */
+    padding: 10px; /* Mobile par padding kam */
+  }
+  
+  /* Zooming issue fix: container-fluid ka overflow rokein */
+  body, html {
+    overflow-x: hidden;
+    width: 100%;
+  }
     }
   </style>
 </head>
