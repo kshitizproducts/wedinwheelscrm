@@ -127,6 +127,33 @@
                         </a>
                     </li>
                 @endcan
+
+  
+
+                {{-- Company List Master  --}}
+
+                     @can('view master')
+                    <li>
+                        <a href="{{ url('companies') }}">
+                            <i class="fa-solid fa-calendar-days me-2"></i> Company List Master
+                        </a>
+                    </li>
+                    
+                @endcan
+                {{-- End of company list master --}}
+
+                
+                {{-- Company List Master  --}}
+
+                     @can('view master')
+                    <li>
+                        <a href="{{ url('product_category') }}">
+                            <i class="fa-solid fa-calendar-days me-2"></i> Product Category (Inventory)
+                        </a>
+                    </li>
+                    
+                @endcan
+                {{-- End of company list master --}}
             </ul>
             @endcan
 

@@ -17,7 +17,8 @@ use App\Http\Controllers\LeadController;
 use App\Http\Controllers\CompanyprofileController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\StockController;
-
+use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\CategoryController;
 
 use Illuminate\Support\Facades\Mail;
 use App\Mail\TestEmail;
@@ -253,4 +254,27 @@ Route::get('employee-docs/print/{id}', [EmployeeDocumentationController::class, 
 
 
 
+
+
+
+
+// company master routes
+Route::get('/companies', [CompanyController::class, 'index']);
+Route::post('/store-company', [CompanyController::class, 'store']);
+Route::get('/delete-company/{id}', [CompanyController::class, 'delete']);
+
+
+
+// Category Routes
+Route::get('/product_category', [CategoryController::class, 'index'])->name('product_category');
+Route::post('/store-category', [CategoryController::class, 'store']);
+Route::get('/delete-category/{id}', [CategoryController::class, 'delete']);
+
+
+
+
+
+
+
 });
+ 
