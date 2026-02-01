@@ -164,7 +164,7 @@
         }
 
         function deleteItem(id) {
-            Swal.fire({
+            Swal.fire({ 
                 title: 'Are you sure?',
                 icon: 'warning',
                 showCancelButton: true,

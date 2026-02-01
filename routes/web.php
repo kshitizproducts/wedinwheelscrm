@@ -30,7 +30,7 @@ Route::get('/stock', [StockController::class, 'index']);
 Route::post('/store-stock', [StockController::class, 'store']);
 Route::post('/update-stock', [StockController::class, 'update']);
 Route::post('/delete-stock', [StockController::class, 'delete']);
-Route::get('/get-items-by-category/{id}', [StockController::class, 'tem-master']);
+Route::get('/get-items-by-category/{id}', [StockController::class, 'getItemsByCategory']);
 
 
 
