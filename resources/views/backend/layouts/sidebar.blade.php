@@ -164,9 +164,23 @@
                             <i class="fa-solid fa-box me-2"></i> Item Master
                         </a>
                     </li>
-                    
+                      
                 @endcan
                 {{-- End of item master --}}
+
+
+                {{-- seller master list --}}
+                    
+                     @can('view master')
+                    <li>
+                        <a href="{{ url('seller_master') }}">
+                            <i class="fa-solid fa-box me-2"></i> Seller Master
+                        </a>
+                    </li>
+                    
+                @endcan
+
+                {{-- end of seller master list --}}
             </ul>
             @endcan
 

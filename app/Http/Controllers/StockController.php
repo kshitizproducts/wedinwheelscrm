@@ -57,6 +57,19 @@ public function getItemsByCategory($catId)
         ], 500);
     }
 }
+
+
+public function printInvoice($id) {
+    $stock = DB::table('stocks') // apni table ka naam check kar lein
+        ->leftJoin('product_item_master', 'stocks.item_id', '=', 'product_item_master.id')
+        ->select('stocks.*', 'product_item_master.item_name')
+        ->where('stocks.id', $id)
+        ->first();
+
+    if (!$stock) { return redirect()->back()->with('error', 'Record not found'); }
+
+    return view('backend.pages.stock.invoice', compact('stock'));
+}
  public function index()
 {
     // Joins use karne se page load speed 10x fast ho jayegi
@@ -69,10 +82,11 @@ public function getItemsByCategory($catId)
 
     $company_list = DB::table('company_list')->get();
     $category_master = DB::table('product_category_master')->get();
+     $seller_masters = DB::table('seller_masters')->get();
 
     // dd($stocks);
 
-    return view('backend.pages.stock.index', compact('stocks', 'company_list', 'category_master'));
+    return view('backend.pages.stock.index', compact('stocks', 'company_list', 'category_master','seller_masters'));
 }
     public function store(Request $request)
     {
@@ -89,7 +103,8 @@ public function getItemsByCategory($catId)
         'category_id' => 'required',
         'item_id' => 'required',
         'receipt_no' => 'required',
-        'seller_name' => 'required',
+        'seller_id' => 'required',
+        // 'seller_name' => 'required',
         'seller_contact' => 'required',
         'payer_name' => 'required',
         'payer_contact' => 'required',
@@ -139,6 +154,7 @@ public function getItemsByCategory($catId)
         'warranty_end_date'   => $request->warranty_end_date,
         'mrp'                 => $request->mrp,
         'purchase_price'      => $request->purchase_price,
+        'seller_id'          => $request->seller_id,
         'seller_name'         => $request->seller_name,
         'seller_contact'      => $request->seller_contact,
         'payer_name'          => $request->payer_name,

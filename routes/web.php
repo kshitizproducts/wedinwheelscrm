@@ -20,8 +20,10 @@ use App\Http\Controllers\StockController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ItemController;
+use App\Http\Controllers\SellerController;
 
-use Illuminate\Support\Facades\Mail;
+
+use Illuminate\Support\Facades\Mail; 
 use App\Mail\TestEmail;
 
 
@@ -31,7 +33,7 @@ Route::post('/store-stock', [StockController::class, 'store']);
 Route::post('/update-stock', [StockController::class, 'update']);
 Route::post('/delete-stock', [StockController::class, 'delete']);
 Route::get('/get-items-by-category/{id}', [StockController::class, 'getItemsByCategory']);
-
+Route::get('print-invoice/{id}', [StockController::class, 'printInvoice']);
 
 
 Route::get('/car-share/{token}', [LeadController::class, 'publicShowcase']);
@@ -277,6 +279,24 @@ Route::get('/delete-category/{id}', [CategoryController::class, 'delete']);
 Route::get('/item-master', [ItemController::class, 'index']);
 Route::post('/store-item', [ItemController::class, 'store']);
 Route::get('/delete-item/{id}', [ItemController::class, 'delete']);
+
+
+
+
+// seller master
+Route::get('seller_master', [SellerController::class, 'index']);
+Route::post('store-seller', [SellerController::class, 'store']);
+Route::get('delete-seller/{id}', [SellerController::class, 'delete']);
+
+
+
+
+
+
+
+
+
+
 
 
 });
