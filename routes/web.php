@@ -19,6 +19,7 @@ use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\StockController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ItemController;
 
 use Illuminate\Support\Facades\Mail;
 use App\Mail\TestEmail;
@@ -29,7 +30,7 @@ Route::get('/stock', [StockController::class, 'index']);
 Route::post('/store-stock', [StockController::class, 'store']);
 Route::post('/update-stock', [StockController::class, 'update']);
 Route::post('/delete-stock', [StockController::class, 'delete']);
-
+Route::get('/get-items-by-category/{id}', [StockController::class, 'getItemsByCategory']);
 
 
 
@@ -272,8 +273,10 @@ Route::get('/delete-category/{id}', [CategoryController::class, 'delete']);
 
 
 
-
-
+// Item master
+Route::get('/item-master', [ItemController::class, 'index']);
+Route::post('/store-item', [ItemController::class, 'store']);
+Route::get('/delete-item/{id}', [ItemController::class, 'delete']);
 
 
 });

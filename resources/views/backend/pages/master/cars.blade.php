@@ -22,6 +22,7 @@
                         <thead class="text-warning small text-uppercase">
                             <tr>
                                 <th>#</th>
+                                <th>Photo</th>
                                 <th>Brand</th>
                                 <th>Model</th>
                                 <th>Rate (₹/Km)</th>
@@ -34,7 +35,25 @@
                             @php $sl = 1; @endphp
                             @foreach ($cars as $car)
                                 <tr>
-                                    <td class="text-muted small">{{ $sl++ }}</td>
+                                    <td class="text-white small">{{ $sl++ }}</td>
+                                    <td>
+    @php
+        // Aapke provided logic ke hisaab se profile_pic use kar rahe hain
+        $profileUrl = $car->profile_pic; 
+    @endphp
+
+    @if($profileUrl && $profileUrl != 'NA')
+        <img src="{{ asset($profileUrl) }}" alt="Car Photo" 
+             class="rounded border border-secondary shadow-sm" 
+             style="width: 50px; height: 40px; object-fit: cover;"
+             onerror="this.src='https://cdn-icons-png.flaticon.com/512/744/744465.png';">
+    @else
+        <div class="bg-secondary rounded d-flex align-items-center justify-content-center border border-dark" 
+             style="width: 50px; height: 40px;">
+            <i class="fas fa-car text-white-50" style="font-size: 1.2rem;"></i>
+        </div>
+    @endif
+</td>
                                     <td class="fw-bold">{{ $car->brand }}</td>
                                     <td>{{ $car->model }}</td>
                                     <td class="text-warning fw-semibold">₹{{ $car->rate_per_km }}</td>
@@ -185,10 +204,8 @@
             </div>
         </div>
     </div>
-@endsection
 
-@section('scripts')
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -280,3 +297,4 @@
         ::-webkit-scrollbar-thumb:hover { background: #ffc107; }
     </style>
 @endsection
+

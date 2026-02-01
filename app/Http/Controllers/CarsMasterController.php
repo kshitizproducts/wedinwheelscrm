@@ -75,11 +75,14 @@ public function car_status()
 
     public function cars_master()
     {
-        $cars = DB::table('cars')->get();
+        $cars = DB::table('cars')
+          ->orderBy('id', 'desc')
+          ->get();
+
         return view('backend.pages.master.cars', compact('cars'));
     }
     
- 
+   
      public function add_new_cars(Request $request)
     {
         // dd($request->all());

@@ -30,6 +30,7 @@
                                 <th>Product Details</th>
                                 <th>Company</th>
                                 <th>Product Category</th>
+                                <th>Item</th>
                                 <th>Status</th>
                                 <th>Pricing</th>
                                 <th>Warranty</th>
@@ -51,6 +52,15 @@
                                     <td>{{ $item->company_name ?? 'NA' }}</td>
                                     <td>{{ $item->category_name ?? 'NA' }}</td>
                                     <td>
+
+                                        @php
+                                        $item_d= DB::table('product_item_master')->where('id',$item->item_id)->first();
+                                        @endphp
+                                        {{ $item_d->item_name ?? 'NA' }}
+
+                                    </td>
+                                    <td>
+                                        
                                         <span
                                             class="badge {{ $item->condition_type == 'new' ? 'bg-success text-white' : 'bg-info text-dark' }} rounded-pill px-3">
                                             {{ strtoupper($item->condition_type ?? 'NA') }}
@@ -313,13 +323,65 @@
 
 
                                     <div class="col-md-6">
-                                        <label class="form-label fw-semibold">Product Category</label>
-                                        <select class="form-select shadow-sm" name="category_id">
-                                            @foreach ($category_master as $category)
-                                                <option value="{{ $category->id }}">{{ $category->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
+    <label class="form-label fw-semibold">Product Category *</label>
+    <select class="form-select shadow-sm" name="category_id" id="main_category_id" required onchange="fetchItems(this.value)">
+        <option value="">-- Select Category --</option>
+        @foreach ($category_master as $category)
+            <option value="{{ $category->id }}">{{ $category->name }}</option>
+        @endforeach
+    </select>
+</div>
+
+<div class="col-md-6">
+    <label class="form-label fw-semibold">Select Item *</label>
+    <select class="form-select shadow-sm" name="item_id" id="item_dropdown" required>
+        <option value="">-- First Select Category --</option>
+    </select>
+</div>
+
+
+<script>
+    // Category change hone par Items load karne ka function
+function fetchItems(catId) {
+    const itemDropdown = $('#item_dropdown'); // Check karein dropdown ki ID yahi hai na?
+    
+    // Pehle loading state dikhayein
+    itemDropdown.html('<option value="">Loading...</option>');
+
+    if (!catId) {
+        itemDropdown.html('<option value="">-- First Select Category --</option>');
+        return;
+    }
+
+    $.ajax({
+        url: "{{ url('get-items-by-category') }}/" + catId,
+        type: "GET",
+        dataType: "json",
+        success: function(response) {
+            console.log("Data Recieved:", response); // Browser console check karein data aa raha h ya nahi
+
+            if (response.success && response.data.length > 0) {
+                let options = '<option value="">-- Select Item --</option>';
+                
+                // Aapke JSON ke hisaab se response.data par loop chalega
+                $.each(response.data, function(index, item) {
+                    options += `<option value="${item.id}">${item.item_name} [${item.item_code}]</option>`;
+                });
+                
+                itemDropdown.html(options);
+            } else {
+                itemDropdown.html('<option value="">No items found in this category</option>');
+            }
+        },
+        error: function(xhr) {
+            console.error("AJAX Error:", xhr.responseText);
+            itemDropdown.html('<option value="">Error fetching data</option>');
+        }
+    });
+}
+
+
+</script>
                                     {{--  --}}
                                     <div class="col-md-6">
                                         <label class="form-label fw-semibold">Warranty Start Date</label>

@@ -14,7 +14,7 @@
                 <i class="fas fa-plus-circle me-2"></i>New Category
             </button>
         </div>
-
+ 
         <div class="card bg-dark border-0 shadow-lg">
             <div class="card-body p-4">
                 <div class="table-responsive">
@@ -23,6 +23,7 @@
                             <tr class="text-warning border-secondary">
                                 <th class="ps-3">#</th>
                                 <th>Category Name</th>
+                                <th class="text-center">Category Code</th>
                                 <th>Created Date</th>
                                 <th class="text-center">Actions</th>
                             </tr>
@@ -32,6 +33,7 @@
                                 <tr>
                                     <td class="text-white-50 small ps-3">{{ $key + 1 }}</td>
                                     <td class="fw-bold">{{ $item->name }}</td>
+                                    <td class="text-center">{{ $item->code }}</td>
                                     <td class="text-white-50 small">{{ date('d-m-Y', strtotime($item->created_at)) }}</td>
                                     <td class="text-center">
                                         <div class="d-flex justify-content-center gap-2">
@@ -72,6 +74,13 @@
                             <input required type="text" name="name" id="cat_name"
                                 class="form-control bg-dark text-white border-secondary shadow-none"
                                 placeholder="e.g. Electronics, Furniture">
+                        </div>
+
+                          <div class="mb-3">
+                            <label class="form-label fw-semibold">Category Code <span class="text-warning">*</span></label>
+                            <input required type="text" name="code" id="cat_code"
+                                class="form-control bg-dark text-white border-secondary shadow-none"
+                                placeholder="e.g. ELEC, FURN">
                         </div>
 
                         <div id="cat-progress" class="d-none mt-3">

@@ -19,12 +19,14 @@ class CategoryController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
+            'code' => 'required|string|max:50',
         ]);
 
         try {
             $id = $request->id;
             $data = [
                 'name' => $request->name,
+                'code' => $request->code,
                 'updated_at' => Carbon::now(),
             ];
 

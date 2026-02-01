@@ -29,6 +29,34 @@ public static function middleware(): array
         new Middleware(middleware: 'permission:delete stocks', only: ['delete']),
     ];    
 }
+
+
+/**
+ * Category ID ke basis par Items fetch karne ke liye (AJAX)
+ */
+public function getItemsByCategory($catId)
+{
+    try {
+        // Raw DB query use kar rahe hain speed ke liye
+        $items = DB::table('product_item_master')
+            ->where('category_id', $catId)
+            ->select('id', 'item_name', 'item_code')
+            ->orderBy('item_name', 'asc')
+            ->get();
+
+        // Agar items milte hain toh JSON return karein
+        return response()->json([
+            'success' => true,
+            'data'    => $items
+        ]);
+        
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false, 
+            'message' => 'Bhai, items fetch karne mein error aa gaya: ' . $e->getMessage()
+        ], 500);
+    }
+}
  public function index()
 {
     // Joins use karne se page load speed 10x fast ho jayegi
@@ -59,6 +87,7 @@ public static function middleware(): array
         'product_name' => 'required|string|max:255',
         'company_id' => 'required',
         'category_id' => 'required',
+        'item_id' => 'required',
         'receipt_no' => 'required',
         'seller_name' => 'required',
         'seller_contact' => 'required',
@@ -84,11 +113,25 @@ public static function middleware(): array
         ], 422);
     }
 
+
+    $cat = DB::table('product_category_master')->where('id', $request->category_id)->first();
+        $catCode = $cat ? $cat->code : 'XX';
+
+        // Item Code lein (e.g., PN)
+        $item = DB::table('product_item_master')->where('id', $request->item_id)->first();
+        $itemCode = $item ? $item->item_code : 'YY';
+        $lastId = DB::table('stocks')->latest('id')->first();
+        $nextNum = $lastId ? ($lastId->id + 1) : 1;
+        $formattedNum = str_pad($nextNum, 5, '0', STR_PAD_LEFT); // 00011 format
+        $unique_id = strtoupper($catCode . '-' . $itemCode . '-' . $formattedNum);
+
+        // dd($unique_id);
     // 2. Prepare Data (Database columns ke mutabik)
     $insertData = [
         'receipt_no'          => $request->receipt_no,
         'product_name'        => $request->product_name,
         'product_category'    => $request->category_id, // Table column: product_category
+        'item_id'             => $request->item_id,
         'company'             => $request->company_id,  // Table column: company
         'condition_type'      => $request->condition_type,
         'warranty_start_date' => $request->warranty_start_date,
@@ -102,6 +145,7 @@ public static function middleware(): array
         'payer_contact'       => $request->payer_contact,
         'receiver_name'       => $request->receiver_name,
         'receiver_contact'    => $request->receiver_contact,
+        'unique_id'          => $unique_id,
         'updated_at'          => now()
     ];
 
@@ -132,7 +176,7 @@ public static function middleware(): array
             DB::table('stocks')->where('id', $id)->update($insertData);
             return response()->json(['success' => true, 'message' => 'Stock Updated Successfully!']);
         } else {
-            $insertData['unique_id'] = 'STK-' . strtoupper(Str::random(8));
+          
             $insertData['created_at'] = now();
             DB::table('stocks')->insert($insertData);
             return response()->json(['success' => true, 'message' => 'Stock Added Successfully!']);

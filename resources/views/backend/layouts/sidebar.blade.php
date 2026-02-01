@@ -154,6 +154,19 @@
                     
                 @endcan
                 {{-- End of company list master --}}
+
+                {{-- item master -- }}
+                {{-- Item Master --}}
+
+                     @can('view master')
+                    <li>
+                        <a href="{{ url('item-master') }}">
+                            <i class="fa-solid fa-box me-2"></i> Item Master
+                        </a>
+                    </li>
+                    
+                @endcan
+                {{-- End of item master --}}
             </ul>
             @endcan
 
