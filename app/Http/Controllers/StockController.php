@@ -129,18 +129,51 @@ public function printInvoice($id) {
     }
 
 
-    $cat = DB::table('product_category_master')->where('id', $request->category_id)->first();
-        $catCode = $cat ? $cat->code : 'XX';
+ $cat = DB::table('product_category_master')
+        ->where('id', $request->category_id)
+        ->first();
+$catCode = $cat ? strtoupper($cat->code) : 'XX';
 
-        // Item Code lein (e.g., PN)
-        $item = DB::table('product_item_master')->where('id', $request->item_id)->first();
-        $itemCode = $item ? $item->item_code : 'YY';
-        $lastId = DB::table('stocks')->latest('id')->first();
-        $nextNum = $lastId ? ($lastId->id + 1) : 1;
-        $formattedNum = str_pad($nextNum, 5, '0', STR_PAD_LEFT); // 00011 format
-        $unique_id = strtoupper($catCode . '-' . $itemCode . '-' . $formattedNum);
+$item = DB::table('product_item_master')
+        ->where('id', $request->item_id)
+        ->first();
+$itemCode = $item ? strtoupper($item->item_code) : 'YY';
 
-        // dd($unique_id);
+/*
+|--------------------------------------------------------------------------
+| Count existing records for this Cat + Item
+|--------------------------------------------------------------------------
+*/
+$totalCount = DB::table('stocks')
+    ->where('product_category', $request->category_id)
+    ->where('item_id', $request->item_id)
+    ->count();
+
+/*
+|--------------------------------------------------------------------------
+| Determine Alphabet Prefix (A, B, C...)
+|--------------------------------------------------------------------------
+*/
+$seriesIndex = floor($totalCount / 99999); // 0 = A, 1 = B, 2 = C
+$prefixLetter = chr(65 + $seriesIndex);   // 65 = ASCII A
+
+/*
+|--------------------------------------------------------------------------
+| Running number inside that alphabet block
+|--------------------------------------------------------------------------
+*/
+$runningNumber = ($totalCount % 99999) + 1;
+$formattedNum = str_pad($runningNumber, 5, '0', STR_PAD_LEFT);
+
+/*
+|--------------------------------------------------------------------------
+| Final Unique ID
+|--------------------------------------------------------------------------
+*/
+$unique_id = $prefixLetter . '-' . $catCode . '-' . $itemCode . '-' . $formattedNum;
+
+
+       //dd($unique_id);
     // 2. Prepare Data (Database columns ke mutabik)
     $insertData = [
         'receipt_no'          => $request->receipt_no,
