@@ -30,7 +30,7 @@ Route::get('/stock', [StockController::class, 'index']);
 Route::post('/store-stock', [StockController::class, 'store']);
 Route::post('/update-stock', [StockController::class, 'update']);
 Route::post('/delete-stock', [StockController::class, 'delete']);
-Route::get('/get-items-by-category/{id}', [StockController::class, 'getItemsByCategory']);
+Route::get('/get-items-by-category/{id}', [StockController::class, 'tem-master']);
 
 
 
@@ -48,7 +48,7 @@ Route::get('/send-test-mail', function () {
 });
 
 require_once base_path('routes/role_permission.php');
-require_once base_path('routes/user.php');
+require_once base_path('routes/user.php');     
 require_once base_path('routes/cars.php');
 require_once base_path('routes/notification.php');
 require_once base_path('routes/garage.php');
